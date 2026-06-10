@@ -385,18 +385,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-## 🔗 Resources
-
-- [Extension Booster](https://extensionbooster.net/) — Build, optimize, and grow Chrome extensions
-- [Chrome Extensions Docs](https://developer.chrome.com/docs/extensions)
-- [Chrome Web Store Publishing](https://developer.chrome.com/docs/webstore)
-- [Manifest V3 Migration](https://developer.chrome.com/docs/extensions/develop/migrate)
-- [WXT Framework](https://wxt.dev/) — File-based, multi-framework extension scaffolder
-- [Plasmo Framework](https://docs.plasmo.com/) — React-first extension framework with auto-manifest
-- [Plasmo Quickstarts](https://docs.plasmo.com/quickstarts) — Ready-to-use templates with Tailwind, Redux, etc.
-
----
-
 ## 📄 License
 
 [MIT](LICENSE) © [quangpl](https://github.com/quangpl)
