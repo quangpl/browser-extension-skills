@@ -51,10 +51,11 @@ grep -rn "onMessage\.addListener\|onMessageExternal" src/ --include="*.ts" --inc
 ```
 
 **Required pattern:**
+
 ```ts
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return; // validate sender
-  if (msg.type !== 'EXPECTED_TYPE') return;     // validate type
+  if (msg.type !== "EXPECTED_TYPE") return; // validate type
   // safe to process
 });
 ```

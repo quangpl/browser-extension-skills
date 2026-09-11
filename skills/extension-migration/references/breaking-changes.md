@@ -9,6 +9,7 @@
 // MV3
 "background": { "service_worker": "background.js" }
 ```
+
 No DOM, no `window`, no `document`. Service worker terminates when idle.
 
 ## 2. browser_action / page_action → action
@@ -21,6 +22,7 @@ No DOM, no `window`, no `document`. Service worker terminates when idle.
 // MV3
 "action": { "default_icon": "icon.png", "default_popup": "popup.html" }
 ```
+
 ```js
 // MV2
 chrome.browserAction.onClicked.addListener(...)
@@ -38,34 +40,44 @@ chrome.action.show(tabId)
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => ({ cancel: true }),
   { urls: ["*://ads.example.com/*"] },
-  ["blocking"]
-)
+  ["blocking"],
+);
 
 // MV3
 chrome.declarativeNetRequest.updateDynamicRules({
-  addRules: [{
-    id: 1,
-    priority: 1,
-    action: { type: "block" },
-    condition: { urlFilter: "*://ads.example.com/*", resourceTypes: ["main_frame"] }
-  }]
-})
+  addRules: [
+    {
+      id: 1,
+      priority: 1,
+      action: { type: "block" },
+      condition: {
+        urlFilter: "*://ads.example.com/*",
+        resourceTypes: ["main_frame"],
+      },
+    },
+  ],
+});
 ```
 
 ## 4. executeScript String → Function/Files
 
 ```js
 // MV2
-chrome.tabs.executeScript(tabId, { code: 'document.body.style.backgroundColor = "red"' })
+chrome.tabs.executeScript(tabId, {
+  code: 'document.body.style.backgroundColor = "red"',
+});
 
 // MV3
 chrome.scripting.executeScript({
   target: { tabId },
-  func: () => { document.body.style.backgroundColor = "red" }
-})
+  func: () => {
+    document.body.style.backgroundColor = "red";
+  },
+});
 // or with file
-chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] })
+chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] });
 ```
+
 Add `scripting` to permissions in MV3.
 
 ## 5. Remote Code → Local Bundling
@@ -77,18 +89,22 @@ Add `scripting` to permissions in MV3.
 <!-- MV3: NOT allowed, bundle locally -->
 <script src="library.js"></script>
 ```
+
 No CDN scripts, no `eval()`, no `new Function(string)`, no `setTimeout(string)`.
 
 ## 6. tabs.executeScript → scripting.executeScript
 
 ```js
 // MV2
-chrome.tabs.executeScript(tabId, { file: "content.js" }, callback)
-chrome.tabs.insertCSS(tabId, { file: "style.css" })
+chrome.tabs.executeScript(tabId, { file: "content.js" }, callback);
+chrome.tabs.insertCSS(tabId, { file: "style.css" });
 
 // MV3
-await chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] })
-await chrome.scripting.insertCSS({ target: { tabId }, files: ["style.css"] })
+await chrome.scripting.executeScript({
+  target: { tabId },
+  files: ["content.js"],
+});
+await chrome.scripting.insertCSS({ target: { tabId }, files: ["style.css"] });
 ```
 
 ## 7. content_security_policy: String → Object
@@ -138,9 +154,10 @@ await chrome.scripting.insertCSS({ target: { tabId }, files: ["style.css"] })
 
 ```js
 // MV2
-const url = chrome.extension.getURL("images/icon.png")
+const url = chrome.extension.getURL("images/icon.png");
 
 // MV3
-const url = chrome.runtime.getURL("images/icon.png")
+const url = chrome.runtime.getURL("images/icon.png");
 ```
+
 `chrome.extension.getURL` still works but is deprecated. Migrate proactively.

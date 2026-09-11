@@ -5,18 +5,21 @@ description: "Generate and validate manifest.json with optimal permissions for C
 
 # Extension Manifest & Permissions Generator
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Generate the best `manifest.json` based on current extension implementation. Analyze code to determine minimum permissions following Chrome docs and best practices.
 
 ## Workflow
 
-1. **Detect** framework: check for `wxt.config.ts`, `plasmo.config.ts`, or raw `manifest.json`
+1. **Detect** framework: check for `wxt.config.ts`, `crxjs.config.ts`, or raw `manifest.json`
 2. **Scan** the extension codebase for Chrome API usage
 3. **Map** each API call to its required permission (see `references/api-permission-map.md`)
 4. **Generate** manifest.json with minimum required permissions
 5. **Validate** against Chrome docs and CWS policies
 6. **Report** permission warnings users will see
 
-> **Plasmo projects**: Manifest is auto-generated from code and `package.json`. Override via `plasmo.config.ts`. See https://docs.plasmo.com/
+> **CRXJS projects**: Manifest is auto-generated from code and `package.json`. Override via `crxjs.config.ts`. See https://docs.crxjs.com/
 
 ## Docs References
 
@@ -31,8 +34,15 @@ Generate the best `manifest.json` based on current extension implementation. Ana
   "name": "Extension Name",
   "version": "1.0.0",
   "description": "Brief description. Max 132 chars for CWS.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
-  "action": { "default_popup": "popup.html", "default_icon": { "16": "icons/icon16.png" } },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png" }
+  },
   "permissions": [],
   "host_permissions": [],
   "background": { "service_worker": "background.js", "type": "module" }
@@ -49,14 +59,14 @@ Generate the best `manifest.json` based on current extension implementation. Ana
 
 ## Common Mistakes
 
-| Error | Fix |
-|-------|-----|
-| `host_permissions` inside `permissions` | Move URLs to separate `host_permissions` array |
-| Using `<all_urls>` | Narrow to specific domain patterns |
-| Missing `activeTab` | Add when only needing current tab on user click |
-| `tabs` permission overuse | Only needed for tab URL/title; use `activeTab` instead |
-| `content_security_policy` as string | Must be object: `{ "extension_pages": "..." }` |
-| `web_accessible_resources` as string[] | Use object with `resources` + `matches` |
+| Error                                   | Fix                                                    |
+| --------------------------------------- | ------------------------------------------------------ |
+| `host_permissions` inside `permissions` | Move URLs to separate `host_permissions` array         |
+| Using `<all_urls>`                      | Narrow to specific domain patterns                     |
+| Missing `activeTab`                     | Add when only needing current tab on user click        |
+| `tabs` permission overuse               | Only needed for tab URL/title; use `activeTab` instead |
+| `content_security_policy` as string     | Must be object: `{ "extension_pages": "..." }`         |
+| `web_accessible_resources` as string[]  | Use object with `resources` + `matches`                |
 
 ## Key MV3 Rules
 

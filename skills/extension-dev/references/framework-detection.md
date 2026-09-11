@@ -3,14 +3,14 @@
 ## Step 1: Check for config files
 
 ```bash
-ls wxt.config.ts wxt.config.js plasmo.config.ts vite.config.ts vite.config.js manifest.json 2>/dev/null
+ls wxt.config.ts wxt.config.js crxjs.config.ts vite.config.ts vite.config.js manifest.json 2>/dev/null
 ```
 
 ## Decision Tree
 
 ```
 wxt.config.ts exists?          → WXT
-package.json has "plasmo"?     → Plasmo
+package.json has "crxjs"?     → CRXJS
 vite.config has "@crxjs"?      → CRXJS
 manifest.json in root?         → Vanilla (no build tool)
 ```
@@ -22,12 +22,12 @@ cat package.json | grep -E '"react"|"vue"|"svelte"|"solid"'
 ```
 
 | Dependency | UI Framework |
-|---|---|
-| `react` | React |
-| `vue` | Vue |
-| `svelte` | Svelte |
-| `solid-js` | Solid |
-| none | Vanilla JS |
+| ---------- | ------------ |
+| `react`    | React        |
+| `vue`      | Vue          |
+| `svelte`   | Svelte       |
+| `solid-js` | Solid        |
+| none       | Vanilla JS   |
 
 ---
 
@@ -38,6 +38,7 @@ cat package.json | grep -E '"react"|"vue"|"svelte"|"solid"'
 **Docs:** https://wxt.dev/guide/essentials/
 
 **Structure:**
+
 ```
 entrypoints/       ← popup, background, content scripts
 wxt.config.ts      ← permissions, manifest overrides, modules
@@ -46,6 +47,7 @@ public/            ← static assets
 ```
 
 **Dev commands:**
+
 ```bash
 pnpm dev           # Chrome dev mode, HMR enabled
 pnpm dev:firefox   # Firefox dev mode
@@ -55,13 +57,14 @@ pnpm zip           # Store-ready .zip
 
 ---
 
-## Plasmo
+## CRXJS
 
-**Detection:** `package.json` contains `"plasmo"` in dependencies or scripts.
+**Detection:** `package.json` contains `"crxjs"` in dependencies or scripts.
 
-**Docs:** https://docs.plasmo.com/
+**Docs:** https://docs.crxjs.com/
 
 **Structure:**
+
 ```
 popup.tsx          ← popup entrypoint
 background.ts      ← service worker
@@ -71,6 +74,7 @@ options.tsx        ← options page
 ```
 
 **Dev commands:**
+
 ```bash
 pnpm dev           # Dev mode
 pnpm build         # Production build
@@ -85,12 +89,13 @@ pnpm package       # Store zip
 
 ```ts
 // vite.config.ts signature
-import { crx } from '@crxjs/vite-plugin'
+import { crx } from "@crxjs/vite-plugin";
 ```
 
 **Docs:** https://crxjs.dev/vite-plugin
 
 **Structure:**
+
 ```
 src/               ← source files
 manifest.json      ← manifest in root (CRXJS reads it)
@@ -99,6 +104,7 @@ dist/              ← build output
 ```
 
 **Dev commands:**
+
 ```bash
 pnpm dev           # Vite dev server, HMR
 pnpm build         # dist/ folder
@@ -113,6 +119,7 @@ pnpm build         # dist/ folder
 **Docs:** https://developer.chrome.com/docs/extensions/get-started
 
 **Structure:**
+
 ```
 manifest.json      ← extension manifest
 popup.html         ← popup
@@ -123,6 +130,7 @@ icons/             ← extension icons
 ```
 
 **Dev commands:**
+
 - No build step. Load unpacked directly.
 - Edit → `chrome://extensions` → reload extension button.
 
@@ -131,11 +139,12 @@ icons/             ← extension icons
 ## Load Extension / Docs Links
 
 Load unpacked from `chrome://extensions` → Enable Developer mode → Load unpacked:
-- WXT: `.output/chrome-mv3-dev` | Plasmo: `build/chrome-mv3-dev` | CRXJS: `dist/` | Vanilla: root
 
-| Framework | Docs |
-|---|---|
-| WXT | https://wxt.dev |
-| Plasmo | https://docs.plasmo.com |
-| CRXJS | https://crxjs.dev |
+- WXT: `.output/chrome-mv3-dev` | CRXJS: `build/chrome-mv3-dev` | CRXJS: `dist/` | Vanilla: root
+
+| Framework         | Docs                                         |
+| ----------------- | -------------------------------------------- |
+| WXT               | https://wxt.dev                              |
+| CRXJS             | https://docs.crxjs.com                       |
+| CRXJS             | https://crxjs.dev                            |
 | Chrome Extensions | https://developer.chrome.com/docs/extensions |

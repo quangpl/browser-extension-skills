@@ -53,18 +53,18 @@ Chrome & browser extensions with AI coding agents.
 
 ## 🤖 Compatible AI Coding Agents
 
-| Agent | Type | Skills Support |
-|-------|------|----------------|
-| [Claude Code](https://docs.claude.com/en/docs/claude-code) | CLI / IDE extension | Native skill loading |
-| [Cursor](https://cursor.com/) | AI-powered IDE | Via `.cursor/rules/` |
-| [Windsurf (Codeium)](https://codeium.com/windsurf) | AI-powered IDE | Via `.windsurfrules` |
-| [GitHub Copilot](https://github.com/features/copilot) | IDE extension | Via `.github/copilot-instructions.md` |
-| [Cline](https://github.com/cline/cline) | VS Code extension | Via `.clinerules` |
-| [Aider](https://aider.chat/) | CLI agent | Via `.aider.conf.yml` conventions |
-| [Continue](https://continue.dev/) | IDE extension | Via `.continue/` config |
-| [Roo Code](https://roo.dev/) | VS Code extension | Via `.roo/rules/` |
-| [Augment Code](https://www.augmentcode.com/) | IDE extension | Via project instructions |
-| [Amazon Q Developer](https://aws.amazon.com/q/developer/) | IDE extension | Via project context |
+| Agent                                                      | Type                | Skills Support                        |
+| ---------------------------------------------------------- | ------------------- | ------------------------------------- |
+| [Claude Code](https://docs.claude.com/en/docs/claude-code) | CLI / IDE extension | Native skill loading                  |
+| [Cursor](https://cursor.com/)                              | AI-powered IDE      | Via `.cursor/rules/`                  |
+| [Windsurf (Codeium)](https://codeium.com/windsurf)         | AI-powered IDE      | Via `.windsurfrules`                  |
+| [GitHub Copilot](https://github.com/features/copilot)      | IDE extension       | Via `.github/copilot-instructions.md` |
+| [Cline](https://github.com/cline/cline)                    | VS Code extension   | Via `.clinerules`                     |
+| [Aider](https://aider.chat/)                               | CLI agent           | Via `.aider.conf.yml` conventions     |
+| [Continue](https://continue.dev/)                          | IDE extension       | Via `.continue/` config               |
+| [Roo Code](https://roo.dev/)                               | VS Code extension   | Via `.roo/rules/`                     |
+| [Augment Code](https://www.augmentcode.com/)               | IDE extension       | Via project instructions              |
+| [Amazon Q Developer](https://aws.amazon.com/q/developer/)  | IDE extension       | Via project context                   |
 
 ---
 
@@ -85,22 +85,29 @@ They turn your AI coding agent into an extension development expert that can:
 
 ---
 
+## 🚀 Upgrade to Premium
+
+Get the Premium version of this AI Kit with advanced templates, priority support, and exclusive skills at:
+**[https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)**
+
+---
+
 ## 📦 Skills Overview
 
-| Skill | Description | Use When |
-|-------|-------------|----------|
-| [`extension-create`](skills/extension-create/) | Auto-scaffold with WXT or Plasmo based on framework choice | Starting a new extension project |
-| [`extension-dev`](skills/extension-dev/) | Develop features with auto-detection for WXT, Plasmo, CRXJS, vanilla | Building new features, debugging |
-| [`extension-manifest`](skills/extension-manifest/) | Generate `manifest.json` or validate Plasmo auto-manifest | Setting up or updating manifest |
-| [`extension-analyze`](skills/extension-analyze/) | Security audit, best practices, CWS compliance (framework-aware) | Pre-submission review, code quality |
-| [`extension-test`](skills/extension-test/) | Unit, integration, and E2E testing with Puppeteer | Writing and running tests |
-| [`extension-assets`](skills/extension-assets/) | Generate icons, screenshots, and store listing images | Preparing visual assets |
-| [`extension-payment`](skills/extension-payment/) | Integrate payments (Stripe, Paddle, Lemon Squeezy, Polar, +10 more) | Monetizing, subscriptions, licensing |
-| [`extension-backend`](skills/extension-backend/) | Build backend APIs with NestJS + MongoDB for auth, licensing, webhooks | Need server-side logic, API proxy |
-| [`extension-ui`](skills/extension-ui/) | Polish extension UI/UX for popup, sidepanel, options (dark mode, a11y) | Building or improving extension UI |
-| [`extension-review`](skills/extension-review/) | Scan code for CWS rejection risks, generate report with fixes | Pre-submission review, compliance |
-| [`extension-publish`](skills/extension-publish/) | Chrome Web Store submission, listing optimization, CI/CD | Publishing and updates |
-| [`extension-migration`](skills/extension-migration/) | Migrate from Manifest V2 to V3 with step-by-step guidance | Upgrading legacy extensions |
+| Skill                                                | Description                                                            | Use When                             |
+| ---------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------ |
+| [`extension-create`](skills/extension-create/)       | Auto-scaffold with WXT or create-crxjs based on framework choice       | Starting a new extension project     |
+| [`extension-dev`](skills/extension-dev/)             | Develop features with auto-detection for WXT, CRXJS, vanilla           | Building new features, debugging     |
+| [`extension-manifest`](skills/extension-manifest/)   | Generate `manifest.json` or validate CRXJS auto-manifest               | Setting up or updating manifest      |
+| [`extension-analyze`](skills/extension-analyze/)     | Security audit, best practices, CWS compliance (framework-aware)       | Pre-submission review, code quality  |
+| [`extension-test`](skills/extension-test/)           | Unit, integration, and E2E testing with Puppeteer                      | Writing and running tests            |
+| [`extension-assets`](skills/extension-assets/)       | Generate icons, screenshots, and store listing images                  | Preparing visual assets              |
+| [`extension-payment`](skills/extension-payment/)     | Integrate payments (Stripe, Paddle, Lemon Squeezy, Polar, +10 more)    | Monetizing, subscriptions, licensing |
+| [`extension-backend`](skills/extension-backend/)     | Build backend APIs with NestJS + MongoDB for auth, licensing, webhooks | Need server-side logic, API proxy    |
+| [`extension-ui`](skills/extension-ui/)               | Polish extension UI/UX for popup, sidepanel, options (dark mode, a11y) | Building or improving extension UI   |
+| [`extension-review`](skills/extension-review/)       | Scan code for CWS rejection risks, generate report with fixes          | Pre-submission review, compliance    |
+| [`extension-publish`](skills/extension-publish/)     | Chrome Web Store submission, listing optimization, CI/CD               | Publishing and updates               |
+| [`extension-migration`](skills/extension-migration/) | Migrate from Manifest V2 to V3 with step-by-step guidance              | Upgrading legacy extensions          |
 
 ---
 
@@ -156,7 +163,7 @@ cp -r browser-extension-skills/skills/extension-dev .claude/skills/
 > Create a Chrome extension that highlights all links on a page
 ```
 
-Your agent activates `extension-create` → asks for framework preference → picks WXT or Plasmo → scaffolds → sets up entrypoints → configures manifest.
+Your agent activates `extension-create` → asks for framework preference → picks WXT or create-crxjs → scaffolds → sets up entrypoints → configures manifest.
 
 </details>
 
@@ -210,33 +217,35 @@ Your agent activates `extension-publish` → validates listing → packages → 
 
 ### `extension-create`
 
-Automatically scaffolds a Chrome extension using [WXT](https://wxt.dev/) or [Plasmo](https://docs.plasmo.com/), chosen based on your UI framework. References [Chrome Extensions Samples](https://github.com/GoogleChrome/chrome-extensions-samples) for proven patterns.
+Automatically scaffolds a Chrome extension using [WXT](https://wxt.dev/) or [create-crxjs](https://crxjs.dev/guide/installation/create-crxjs), chosen based on your UI framework. References [Chrome Extensions Samples](https://github.com/GoogleChrome/chrome-extensions-samples) for proven patterns.
 
 **Scaffolder selection:**
 
-| Framework | Recommended | Why |
-|-----------|-------------|-----|
-| React | Plasmo | CSUI, rich [quickstarts](https://docs.plasmo.com/quickstarts), auto-manifest |
-| Vue / Svelte | WXT | First-class support, file-based entrypoints |
-| Vanilla TS | WXT | Lightest setup |
+| Framework    | Recommended | Why                                               |
+| ------------ | ----------- | ------------------------------------------------- |
+| React        | CRXJS       | Vite plugin integration, fast HMR, standard setup |
+| Vue / Svelte | WXT         | First-class support, file-based entrypoints       |
+| Vanilla TS   | WXT         | Lightest setup                                    |
 
 **Supports:** React, Vue, Svelte, Solid, Vanilla TypeScript
-**Features:** Auto-scaffold, framework-based scaffolder pick, entrypoint generation, Plasmo quickstart templates
+**Features:** Auto-scaffold, framework-based scaffolder pick, entrypoint generation, CRXJS templates
 
 ### `extension-dev`
 
-Auto-detects your framework (WXT, Plasmo, CRXJS, vanilla) and UI library, then finds proper documentation to implement features.
+Auto-detects your framework (WXT, CRXJS, vanilla) and UI library, then finds proper documentation to implement features.
 
 **References:**
+
 - [Getting Started](https://developer.chrome.com/docs/extensions/get-started) · [Development Guide](https://developer.chrome.com/docs/extensions/develop)
 - [API Reference](https://developer.chrome.com/docs/extensions/reference/api) · [Permissions List](https://developer.chrome.com/docs/extensions/reference/permissions-list)
-- [WXT Docs](https://wxt.dev/) · [Plasmo Docs](https://docs.plasmo.com/)
+- [WXT Docs](https://wxt.dev/) · [CRXJS Docs](https://crxjs.dev/)
 
 ### `extension-manifest`
 
-Generates optimal `manifest.json` by analyzing your codebase for Chrome API usage. For Plasmo projects, validates the auto-generated manifest and `plasmo.config.ts` overrides.
+Generates optimal `manifest.json` by analyzing your codebase for Chrome API usage. For CRXJS projects, validates the auto-generated manifest and Vite overrides.
 
 **References:**
+
 - [Manifest Reference](https://developer.chrome.com/docs/extensions/reference/manifest)
 - [Permissions List](https://developer.chrome.com/docs/extensions/reference/permissions-list)
 
@@ -292,54 +301,59 @@ Scans extension source code for Chrome Web Store rejection risks based on [offic
 
 ### `extension-publish`
 
-Handles Chrome Web Store submission, listing optimization, and CI/CD automation. Supports both standard `chrome-webstore-upload` and Plasmo's built-in `plasmo package` workflow.
+Handles Chrome Web Store submission, listing optimization, and CI/CD automation. Supports both standard `chrome-webstore-upload` and CRXJS workflows.
 
-**Features:** Pre-submission checklist, listing SEO, common rejections guide, GitHub Actions workflow, Plasmo publish support
+**Features:** Pre-submission checklist, listing SEO, common rejections guide, GitHub Actions workflow, CRXJS publish support
 
 ### `extension-migration`
 
-Step-by-step migration from Manifest V2 to V3. Suggests adopting WXT or Plasmo during migration for built-in MV3 support.
+Step-by-step migration from Manifest V2 to V3. Suggests adopting WXT or create-crxjs during migration for built-in MV3 support.
 
-**Reference:** [Migration Guide](https://developer.chrome.com/docs/extensions/develop/migrate) · [WXT](https://wxt.dev/) · [Plasmo](https://docs.plasmo.com/)
+**Reference:** [Migration Guide](https://developer.chrome.com/docs/extensions/develop/migrate) · [WXT](https://wxt.dev/) · [CRXJS](https://crxjs.dev/)
 **Covers:** Service workers, `declarativeNetRequest`, CSP changes, API replacements, framework adoption
 
 ---
 
 ## ✅ Requirements
 
-| Requirement | Details |
-|-------------|---------|
-| [Claude Code](https://docs.claude.com/en/docs/claude-code) | CLI or IDE extension |
-| Node.js | v18+ recommended |
-| npm / pnpm / yarn / bun | Any package manager |
-| Chrome | For testing and debugging |
-| Gemini API Key | Optional, for AI-generated assets (`extension-assets`) |
+| Requirement                                                | Details                                                |
+| ---------------------------------------------------------- | ------------------------------------------------------ |
+| [Claude Code](https://docs.claude.com/en/docs/claude-code) | CLI or IDE extension                                   |
+| Node.js                                                    | v18+ recommended                                       |
+| npm / pnpm / yarn / bun                                    | Any package manager                                    |
+| Chrome                                                     | For testing and debugging                              |
+| Gemini API Key                                             | Optional, for AI-generated assets (`extension-assets`) |
 
 ---
 
 ## 💡 Tips & Best Practices
 
 ### Permission Optimization
+
 - Always prefer `activeTab` over broad `tabs` + host permissions
 - Use optional permissions for non-essential features
 - Run `extension-analyze` before every CWS submission
 
 ### Performance
+
 - Keep content scripts under 50KB (lazy-load heavy logic)
 - Service workers should be event-driven (no polling)
 - Use `chrome.storage.session` for temporary data
 
 ### Security
+
 - Validate all message senders (`sender.id === chrome.runtime.id`)
 - Never use `innerHTML` with untrusted data
 - No API keys in source code; use a proxy server
 
 ### Testing
+
 - Extensions cannot run in headless Chrome — always use `headless: false`
 - Each E2E test should get a fresh browser instance
 - Mock `chrome.*` APIs consistently with `jest-chrome` or manual mocks
 
 ### Publishing
+
 - First 150 characters of description appear in search results
 - Screenshots at 1280x800 showing features in action convert best
 - Single-purpose policy: one clear function per extension

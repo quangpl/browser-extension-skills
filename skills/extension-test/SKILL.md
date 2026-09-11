@@ -5,6 +5,9 @@ description: Set up and run unit, integration, and E2E tests for Chrome extensio
 
 # Extension Testing
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 ## Testing Layer Architecture
 
 ```
@@ -31,11 +34,11 @@ npm install -D @testing-library/react @testing-library/jest-dom jsdom
 
 ```ts
 export default {
-  preset: 'ts-jest',
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['./jest.setup.ts'],
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["./jest.setup.ts"],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
 };
 ```
@@ -43,7 +46,7 @@ export default {
 ### jest.setup.ts (minimal)
 
 ```ts
-import chrome from 'jest-chrome';
+import chrome from "jest-chrome";
 Object.assign(global, { chrome });
 ```
 
@@ -63,14 +66,14 @@ npm install -D puppeteer
 ### Launch extension in Chrome
 
 ```ts
-import puppeteer from 'puppeteer';
-import path from 'path';
+import puppeteer from "puppeteer";
+import path from "path";
 
 const browser = await puppeteer.launch({
-  headless: false,           // extensions require non-headless
+  headless: false, // extensions require non-headless
   args: [
-    `--disable-extensions-except=${path.resolve('dist')}`,
-    `--load-extension=${path.resolve('dist')}`,
+    `--disable-extensions-except=${path.resolve("dist")}`,
+    `--load-extension=${path.resolve("dist")}`,
   ],
 });
 ```
@@ -79,9 +82,9 @@ const browser = await puppeteer.launch({
 
 ```ts
 const targets = await browser.targets();
-const extTarget = targets.find(t => t.type() === 'service_worker');
-const extUrl = extTarget?.url() ?? '';
-const [, , extId] = extUrl.split('/');
+const extTarget = targets.find((t) => t.type() === "service_worker");
+const extUrl = extTarget?.url() ?? "";
+const [, , extId] = extUrl.split("/");
 ```
 
 Full E2E patterns → [e2e-testing-puppeteer.md](references/e2e-testing-puppeteer.md)
@@ -90,13 +93,13 @@ Full E2E patterns → [e2e-testing-puppeteer.md](references/e2e-testing-puppetee
 
 ## Chrome API Mocking Strategy
 
-| API | Approach |
-|-----|----------|
-| `chrome.storage` | Mock with in-memory store |
-| `chrome.runtime.sendMessage` | jest.fn() + mock response |
-| `chrome.tabs` | jest.fn() with createMockTab helper |
-| `chrome.action` | jest.fn() stubs |
-| `chrome.alarms` | jest.fn() stubs |
+| API                          | Approach                            |
+| ---------------------------- | ----------------------------------- |
+| `chrome.storage`             | Mock with in-memory store           |
+| `chrome.runtime.sendMessage` | jest.fn() + mock response           |
+| `chrome.tabs`                | jest.fn() with createMockTab helper |
+| `chrome.action`              | jest.fn() stubs                     |
+| `chrome.alarms`              | jest.fn() stubs                     |
 
 All mocks → [chrome-api-mocks.md](references/chrome-api-mocks.md)
 

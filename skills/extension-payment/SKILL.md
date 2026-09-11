@@ -5,6 +5,9 @@ description: "Integrate payment gateways into Chrome extensions. Stripe, Paddle,
 
 # Extension Payment Integration
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Integrate payment/subscription into a Chrome extension. Ask user for provider, then fetch docs and implement.
 
 ## Workflow (Execute This)
@@ -12,6 +15,7 @@ Integrate payment/subscription into a Chrome extension. Ask user for provider, t
 ### Step 1: Ask user for payment requirements
 
 Ask the user to confirm:
+
 1. **Payment model**: One-time purchase / Subscription / Freemium / Credits-based
 2. **Provider category**: Payment Gateway or Merchant of Record (MoR)?
 3. **Preferred provider** (or let us recommend)
@@ -21,24 +25,25 @@ Ask the user to confirm:
 
 ### Step 2: Provider selection guide
 
-| Category | Provider | Best For | Docs |
-|----------|----------|----------|------|
-| **MoR** | Paddle | SaaS subscriptions, global tax | https://developer.paddle.com |
-| **MoR** | Lemon Squeezy | Indie/solo devs, simple setup | https://docs.lemonsqueezy.com |
-| **MoR** | Polar | Open source monetization | https://docs.polar.sh |
-| **MoR** | Creem | Extension-focused MoR | https://docs.creem.io |
-| **MoR** | Dodo Payments | Simple digital products | https://docs.dodopayments.com |
-| **MoR** | FastSpring | Enterprise digital commerce | https://developer.fastspring.com |
-| **MoR** | Gumroad | Creators, digital products | https://help.gumroad.com |
-| **Gateway** | Stripe | Full control, most flexible | https://docs.stripe.com |
-| **Gateway** | PayPal | Wide user base, easy checkout | https://developer.paypal.com/docs |
-| **Gateway** | Razorpay | India-focused payments | https://razorpay.com/docs |
-| **Gateway** | Square | POS + online | https://developer.squareup.com/docs |
-| **Gateway** | Adyen | Enterprise, multi-currency | https://docs.adyen.com |
-| **Gateway** | Braintree | PayPal-owned, cards + PayPal | https://developer.paypal.com/braintree/docs |
-| **Gateway** | Authorize.Net | US legacy, reliable | https://developer.authorize.net |
+| Category    | Provider      | Best For                       | Docs                                        |
+| ----------- | ------------- | ------------------------------ | ------------------------------------------- |
+| **MoR**     | Paddle        | SaaS subscriptions, global tax | https://developer.paddle.com                |
+| **MoR**     | Lemon Squeezy | Indie/solo devs, simple setup  | https://docs.lemonsqueezy.com               |
+| **MoR**     | Polar         | Open source monetization       | https://docs.polar.sh                       |
+| **MoR**     | Creem         | Extension-focused MoR          | https://docs.creem.io                       |
+| **MoR**     | Dodo Payments | Simple digital products        | https://docs.dodopayments.com               |
+| **MoR**     | FastSpring    | Enterprise digital commerce    | https://developer.fastspring.com            |
+| **MoR**     | Gumroad       | Creators, digital products     | https://help.gumroad.com                    |
+| **Gateway** | Stripe        | Full control, most flexible    | https://docs.stripe.com                     |
+| **Gateway** | PayPal        | Wide user base, easy checkout  | https://developer.paypal.com/docs           |
+| **Gateway** | Razorpay      | India-focused payments         | https://razorpay.com/docs                   |
+| **Gateway** | Square        | POS + online                   | https://developer.squareup.com/docs         |
+| **Gateway** | Adyen         | Enterprise, multi-currency     | https://docs.adyen.com                      |
+| **Gateway** | Braintree     | PayPal-owned, cards + PayPal   | https://developer.paypal.com/braintree/docs |
+| **Gateway** | Authorize.Net | US legacy, reliable            | https://developer.authorize.net             |
 
 **llms.txt for AI-assisted docs** (use `docs-seeker` skill):
+
 - Stripe: `https://docs.stripe.com/llms.txt`
 - Polar: `https://docs.polar.sh/llms-full.txt`
 
@@ -51,6 +56,7 @@ Use `docs-seeker` skill to fetch the provider's latest API docs. For Stripe/Pola
 See `references/integration-architecture.md` for the full pattern.
 
 **Key architecture** (extensions cannot run backend code):
+
 ```
 Extension (popup/options) → Your Backend API → Payment Provider
          ↕                        ↕
@@ -60,6 +66,7 @@ Extension (popup/options) → Your Backend API → Payment Provider
 ### Step 5: Show user the post-integration workflow
 
 After integration, show the user this flow:
+
 ```
 User clicks "Upgrade" in extension
   → Opens payment page (provider-hosted or custom)

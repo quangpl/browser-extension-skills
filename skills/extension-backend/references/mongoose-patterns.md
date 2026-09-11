@@ -6,8 +6,8 @@
 
 ```typescript
 // auth/schemas/user.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 @Schema({ timestamps: true })
 export class User extends Document {
@@ -17,7 +17,7 @@ export class User extends Document {
   @Prop({ required: true })
   googleId: string;
 
-  @Prop({ default: 'free', enum: ['free', 'premium', 'enterprise'] })
+  @Prop({ default: "free", enum: ["free", "premium", "enterprise"] })
   plan: string;
 
   @Prop()
@@ -31,15 +31,15 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 ```typescript
 // license/schemas/license.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 @Schema({ timestamps: true })
 export class License extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
+  @Prop({ type: Types.ObjectId, ref: "User", required: true, index: true })
   userId: Types.ObjectId;
 
-  @Prop({ required: true, enum: ['active', 'expired', 'cancelled'] })
+  @Prop({ required: true, enum: ["active", "expired", "cancelled"] })
   status: string;
 
   @Prop({ required: true })
@@ -51,7 +51,10 @@ export class License extends Document {
   @Prop()
   providerSubscriptionId?: string;
 
-  @Prop({ default: 'stripe', enum: ['stripe', 'paddle', 'lemonsqueezy', 'polar'] })
+  @Prop({
+    default: "stripe",
+    enum: ["stripe", "paddle", "lemonsqueezy", "polar"],
+  })
   provider: string;
 }
 
@@ -64,36 +67,54 @@ LicenseSchema.index({ userId: 1, status: 1 });
 
 ```typescript
 // license/license.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { License } from './schemas/license.schema';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { License } from "./schemas/license.schema";
 
 @Injectable()
 export class LicenseService {
-  constructor(@InjectModel(License.name) private licenseModel: Model<License>) {}
+  constructor(
+    @InjectModel(License.name) private licenseModel: Model<License>,
+  ) {}
 
   async findActiveByUserId(userId: string): Promise<License | null> {
-    return this.licenseModel.findOne({
-      userId,
-      status: 'active',
-      $or: [{ expiresAt: { $gt: new Date() } }, { expiresAt: null }],
-    }).exec();
+    return this.licenseModel
+      .findOne({
+        userId,
+        status: "active",
+        $or: [{ expiresAt: { $gt: new Date() } }, { expiresAt: null }],
+      })
+      .exec();
   }
 
-  async activate(userId: string, plan: string, subscriptionId: string, provider: string) {
-    return this.licenseModel.findOneAndUpdate(
-      { userId },
-      { status: 'active', plan, providerSubscriptionId: subscriptionId, provider },
-      { upsert: true, new: true },
-    ).exec();
+  async activate(
+    userId: string,
+    plan: string,
+    subscriptionId: string,
+    provider: string,
+  ) {
+    return this.licenseModel
+      .findOneAndUpdate(
+        { userId },
+        {
+          status: "active",
+          plan,
+          providerSubscriptionId: subscriptionId,
+          provider,
+        },
+        { upsert: true, new: true },
+      )
+      .exec();
   }
 
   async deactivate(subscriptionId: string) {
-    return this.licenseModel.findOneAndUpdate(
-      { providerSubscriptionId: subscriptionId },
-      { status: 'cancelled' },
-    ).exec();
+    return this.licenseModel
+      .findOneAndUpdate(
+        { providerSubscriptionId: subscriptionId },
+        { status: "cancelled" },
+      )
+      .exec();
   }
 }
 ```
@@ -102,14 +123,16 @@ export class LicenseService {
 
 ```typescript
 // license/license.module.ts
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { License, LicenseSchema } from './schemas/license.schema';
-import { LicenseService } from './license.service';
-import { LicenseController } from './license.controller';
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { License, LicenseSchema } from "./schemas/license.schema";
+import { LicenseService } from "./license.service";
+import { LicenseController } from "./license.controller";
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: License.name, schema: LicenseSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: License.name, schema: LicenseSchema }]),
+  ],
   providers: [LicenseService],
   controllers: [LicenseController],
   exports: [LicenseService],

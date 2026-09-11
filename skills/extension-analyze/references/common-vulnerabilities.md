@@ -29,10 +29,11 @@ grep -rn "onMessage\.addListener" src/ --include="*.ts" --include="*.js" -A 3 | 
 ```
 
 **Fix:** Always check `sender.id` and message type.
+
 ```ts
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (sender.id !== chrome.runtime.id) return false;
-  if (!['ACTION_A', 'ACTION_B'].includes(msg.type)) return false;
+  if (!["ACTION_A", "ACTION_B"].includes(msg.type)) return false;
 });
 ```
 

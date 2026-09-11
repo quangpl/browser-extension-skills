@@ -15,10 +15,12 @@ npx wxt@latest init <project-name> --template vanilla
 ```
 
 Flags:
+
 - `--template` / `-t` — framework template
 - `--pm` — package manager: `npm` | `pnpm` | `yarn` | `bun`
 
 Example:
+
 ```bash
 npx wxt@latest init my-extension --template react --pm pnpm
 ```
@@ -49,21 +51,21 @@ WXT scans `entrypoints/` and builds the manifest automatically — no manual man
 ## wxt.config.ts Options
 
 ```ts
-import { defineConfig } from 'wxt';
+import { defineConfig } from "wxt";
 
 export default defineConfig({
   // Target browser
-  browser: 'chrome',           // 'chrome' | 'firefox' | 'safari'
-  extensionApi: 'chrome',      // API type hints
+  browser: "chrome", // 'chrome' | 'firefox' | 'safari'
+  extensionApi: "chrome", // API type hints
 
   // Framework module
-  modules: ['@wxt-dev/module-react'],   // '@wxt-dev/module-vue', etc.
+  modules: ["@wxt-dev/module-react"], // '@wxt-dev/module-vue', etc.
 
   // Manifest overrides
   manifest: {
-    name: '__MSG_extName__',
-    permissions: ['storage', 'tabs'],
-    host_permissions: ['https://*.example.com/*'],
+    name: "__MSG_extName__",
+    permissions: ["storage", "tabs"],
+    host_permissions: ["https://*.example.com/*"],
     content_security_policy: {
       extension_pages: "script-src 'self'; object-src 'self'",
     },
@@ -75,7 +77,7 @@ export default defineConfig({
   }),
 
   // Output directory (default: .output)
-  outDir: '.output',
+  outDir: ".output",
 });
 ```
 
@@ -100,6 +102,7 @@ Load in Chrome: `chrome://extensions` → Developer mode → Load unpacked → `
 ## Auto-imports
 
 WXT auto-imports from:
+
 - `wxt/browser` → `browser` (cross-browser compat wrapper over `chrome`)
 - `wxt/client` → `defineContentScript`, `defineBackground`, etc.
 - React/Vue/etc. framework utilities (via module)
@@ -111,6 +114,7 @@ No explicit imports needed for these in entrypoint files.
 ## TypeScript Setup
 
 WXT generates `.wxt/` with:
+
 - `tsconfig.json` — extends root, adds WXT types
 - `wxt.d.ts` — type declarations
 - `types.d.ts` — auto-import types

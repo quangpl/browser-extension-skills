@@ -5,6 +5,7 @@
 Start with zero permissions. Add only what each feature requires.
 
 Checklist:
+
 - [ ] Every permission maps to a specific feature
 - [ ] No permission declared "just in case"
 - [ ] Host permissions scoped to minimum required domains
@@ -28,7 +29,9 @@ Grants temporary access to the active tab when user invokes extension. No instal
 chrome.action.onClicked.addListener(async (tab) => {
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
-    func: () => { /* runs in page context */ }
+    func: () => {
+      /* runs in page context */
+    },
   });
 });
 ```
@@ -46,7 +49,9 @@ Declare in manifest, request at runtime when user enables a feature.
 
 ```js
 // Request on demand
-const granted = await chrome.permissions.request({ permissions: ["bookmarks"] });
+const granted = await chrome.permissions.request({
+  permissions: ["bookmarks"],
+});
 
 // Check before use
 const has = await chrome.permissions.contains({ permissions: ["bookmarks"] });
@@ -71,6 +76,7 @@ Least permissive:         "https://example.com/api/*"
 ```
 
 Decision tree:
+
 1. Does the extension work on any site the user visits? → `activeTab` first
 2. Specific sites only? → list exact domains
 3. User-configurable sites? → `optional_host_permissions` + runtime request
@@ -90,8 +96,10 @@ Feature unlocked → remove on disable (good UX)
 // Map features to required permissions
 const FEATURE_PERMISSIONS = {
   "sync-bookmarks": { permissions: ["bookmarks"] },
-  "block-trackers": { permissions: ["declarativeNetRequestWithHostAccess"],
-                      origins: ["*://*/*"] },
+  "block-trackers": {
+    permissions: ["declarativeNetRequestWithHostAccess"],
+    origins: ["*://*/*"],
+  },
 };
 
 async function enableFeature(name) {
@@ -118,6 +126,7 @@ Prefer `declarativeNetRequest` (MV3 standard):
 ```
 
 Use `webRequest` only when you need to:
+
 - Read request/response body content
 - Make dynamic decisions based on response data
 - Modify headers dynamically based on complex logic
@@ -127,6 +136,7 @@ Use `webRequest` only when you need to:
 ## Manifest Audit Checklist
 
 Before publishing:
+
 1. Remove any permission not used in code (search codebase for `chrome.X`)
 2. Replace `<all_urls>` with specific domains if possible
 3. Move any permission used in <5% of sessions to optional

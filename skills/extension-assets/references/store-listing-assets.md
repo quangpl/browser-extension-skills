@@ -3,15 +3,17 @@
 ## Required Assets
 
 ### Store Icon
+
 - Size: 128x128 PNG
 - Same file as `icon128.png` in manifest
 - Displayed in search results and listing page
 
 ### Screenshots (required: 1–5)
-| Dimension | Notes |
-|-----------|-------|
-| 1280x800 | Recommended (full HD 16:10) |
-| 640x400 | Alternative (half size) |
+
+| Dimension | Notes                       |
+| --------- | --------------------------- |
+| 1280x800  | Recommended (full HD 16:10) |
+| 640x400   | Alternative (half size)     |
 
 - Format: PNG or JPG
 - No rounded corners — CWS adds them automatically
@@ -20,13 +22,14 @@
 
 ## Promotional Images
 
-| Asset | Size | Purpose |
-|-------|------|---------|
-| Small promo tile | 440x280 | Required for featured/collection placement |
-| Large promo tile | 920x680 | Used in marquee/spotlight |
-| Marquee promo tile | 1400x560 | Homepage banner (invite-only) |
+| Asset              | Size     | Purpose                                    |
+| ------------------ | -------- | ------------------------------------------ |
+| Small promo tile   | 440x280  | Required for featured/collection placement |
+| Large promo tile   | 920x680  | Used in marquee/spotlight                  |
+| Marquee promo tile | 1400x560 | Homepage banner (invite-only)              |
 
 All promo images:
+
 - Format: PNG or JPG
 - No alpha/transparency
 - Include extension name and tagline
@@ -35,11 +38,13 @@ All promo images:
 ## Text Requirements
 
 ### Short Description
+
 - Max: 132 characters
 - Shown in search results
 - Front-load the value proposition
 
 ### Full Description
+
 - Max: 16,000 characters
 - First 150 characters appear in search results — make them count
 - Use line breaks and sections for readability
@@ -56,14 +61,14 @@ All promo images:
 
 ## Category Selection Guide
 
-| Category | Best for |
-|----------|----------|
-| Productivity | Tab management, notes, focus tools |
-| Developer Tools | DevTools, API testers, code helpers |
-| Shopping | Price compare, coupon finders |
-| News & Weather | Feed readers, aggregators |
-| Social & Communication | Chat enhancers, email tools |
-| Accessibility | Screen readers, font tools |
+| Category               | Best for                            |
+| ---------------------- | ----------------------------------- |
+| Productivity           | Tab management, notes, focus tools  |
+| Developer Tools        | DevTools, API testers, code helpers |
+| Shopping               | Price compare, coupon finders       |
+| News & Weather         | Feed readers, aggregators           |
+| Social & Communication | Chat enhancers, email tools         |
+| Accessibility          | Screen readers, font tools          |
 
 ## Generation: Placeholder Assets
 

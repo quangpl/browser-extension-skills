@@ -45,18 +45,19 @@ grep -n '"http" | "https"' manifest.json
 
 **Then**: For each permission, grep source code for its API usage. Flag unused permissions.
 
-| Permission | Verify usage of |
-|------------|----------------|
-| `tabs` | `chrome.tabs.query` (URL/title access) |
-| `history` | `chrome.history.*` |
-| `bookmarks` | `chrome.bookmarks.*` |
-| `cookies` | `chrome.cookies.*` |
-| `webRequest` | `chrome.webRequest.*` |
-| `downloads` | `chrome.downloads.*` |
+| Permission   | Verify usage of                        |
+| ------------ | -------------------------------------- |
+| `tabs`       | `chrome.tabs.query` (URL/title access) |
+| `history`    | `chrome.history.*`                     |
+| `bookmarks`  | `chrome.bookmarks.*`                   |
+| `cookies`    | `chrome.cookies.*`                     |
+| `webRequest` | `chrome.webRequest.*`                  |
+| `downloads`  | `chrome.downloads.*`                   |
 
 ## 4. Missing Privacy Policy (Purple Lithium) — HIGH
 
 Check if extension collects any user data:
+
 ```bash
 # Storage of user data
 grep -rn "chrome\.storage\|localStorage\|indexedDB" src/
@@ -82,6 +83,7 @@ for size in 16 48 128; do ls icons/icon${size}.png 2>/dev/null || echo "MISSING:
 ## 6. Single Purpose (Red Magnesium) — HIGH
 
 Read manifest `description` and all entrypoints. Flag if:
+
 - Multiple unrelated features (e.g., ad blocker + weather widget)
 - New tab override doing unrelated things
 - Content scripts on `<all_urls>` without clear single purpose
@@ -98,6 +100,7 @@ grep -rn "password=\|token=\|key=\|secret=" src/ | grep -v ".env\|config"
 ## 8. Keyword Stuffing (Yellow Argon) — MEDIUM
 
 Check manifest `description` and `name` for:
+
 - Repeated keywords
 - List of competitor names
 - Unrelated buzzwords
@@ -105,6 +108,7 @@ Check manifest `description` and `name` for:
 ## 9. Minimum Functionality (Yellow Potassium) — MEDIUM
 
 Flag if:
+
 - Only `manifest.json` and icons exist (no JS/TS)
 - Extension only opens an external URL
 - Popup just shows a link to a website

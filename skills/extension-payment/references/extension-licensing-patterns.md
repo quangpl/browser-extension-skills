@@ -13,18 +13,21 @@ chrome.runtime.onStartup.addListener(async () => {
   const token = await chrome.identity.getAuthToken({ interactive: false });
   if (!token) return; // Not logged in
 
-  const res = await fetch('https://api.yourapp.com/license', {
-    headers: { Authorization: `Bearer ${token}` }
+  const res = await fetch("https://api.yourapp.com/license", {
+    headers: { Authorization: `Bearer ${token}` },
   });
   const { plan, features } = await res.json();
-  await chrome.storage.local.set({ license: { plan, features, checkedAt: Date.now() } });
+  await chrome.storage.local.set({
+    license: { plan, features, checkedAt: Date.now() },
+  });
 });
 ```
 
 **Feature gating:**
+
 ```typescript
 async function hasFeature(feature: string): Promise<boolean> {
-  const { license } = await chrome.storage.local.get('license');
+  const { license } = await chrome.storage.local.get("license");
   return license?.features?.includes(feature) ?? false;
 }
 ```
@@ -38,9 +41,9 @@ User purchases → receives key → enters in extension options page → validat
 
 ```typescript
 async function validateKey(key: string): Promise<boolean> {
-  const res = await fetch('https://api.yourapp.com/validate-key', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const res = await fetch("https://api.yourapp.com/validate-key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ key, extensionId: chrome.runtime.id }),
   });
   const { valid, expiresAt } = await res.json();
@@ -61,8 +64,11 @@ Free tier has limited usage → premium unlocks unlimited.
 const DAILY_FREE_LIMIT = 10;
 
 async function canUseFeature(): Promise<boolean> {
-  const { license, usageToday } = await chrome.storage.local.get(['license', 'usageToday']);
-  if (license?.plan === 'premium') return true;
+  const { license, usageToday } = await chrome.storage.local.get([
+    "license",
+    "usageToday",
+  ]);
+  if (license?.plan === "premium") return true;
 
   const today = new Date().toDateString();
   const usage = usageToday?.date === today ? usageToday.count : 0;
@@ -71,7 +77,7 @@ async function canUseFeature(): Promise<boolean> {
 
 async function trackUsage() {
   const today = new Date().toDateString();
-  const { usageToday } = await chrome.storage.local.get('usageToday');
+  const { usageToday } = await chrome.storage.local.get("usageToday");
   const count = usageToday?.date === today ? usageToday.count + 1 : 1;
   await chrome.storage.local.set({ usageToday: { date: today, count } });
 }
@@ -85,7 +91,7 @@ Full access for N days → then require payment.
 const TRIAL_DAYS = 7;
 
 async function isTrialActive(): Promise<boolean> {
-  const { installDate } = await chrome.storage.local.get('installDate');
+  const { installDate } = await chrome.storage.local.get("installDate");
   if (!installDate) {
     await chrome.storage.local.set({ installDate: Date.now() });
     return true;
@@ -101,7 +107,7 @@ Show in popup/options when free user hits limit:
 
 ```typescript
 function showUpgradePrompt(reason: string) {
-  const upgradeUrl = 'https://yourapp.com/pricing'; // Or provider checkout URL
+  const upgradeUrl = "https://yourapp.com/pricing"; // Or provider checkout URL
   // Show in popup UI with reason
   // Button opens upgrade URL in new tab
   chrome.tabs.create({ url: upgradeUrl });

@@ -134,6 +134,7 @@
 ## Rollback Strategy
 
 If critical bugs found post-publish:
+
 1. Keep MV2 version in separate git branch (`mv2-stable`)
 2. Revert via Chrome Web Store rollback (if available) or publish MV2 as hotfix
 3. Set `minimum_chrome_version` in MV3 manifest to prevent rollout on unsupported versions

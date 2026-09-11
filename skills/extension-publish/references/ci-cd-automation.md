@@ -37,7 +37,7 @@ name: Publish to Chrome Web Store
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   publish:
@@ -47,7 +47,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm ci
@@ -107,18 +107,18 @@ Add to workflow before build step:
 
 Chrome Web Store has no staging track — use separate extension IDs:
 
-| Track | Extension ID | Visibility |
-|-------|-------------|------------|
-| Staging | `$STAGING_EXT_ID` | Unlisted |
-| Production | `$PROD_EXT_ID` | Public |
+| Track      | Extension ID      | Visibility |
+| ---------- | ----------------- | ---------- |
+| Staging    | `$STAGING_EXT_ID` | Unlisted   |
+| Production | `$PROD_EXT_ID`    | Public     |
 
 Workflow strategy:
 
 ```yaml
 on:
   push:
-    branches: [main]    # → upload to staging (unlisted)
-    tags: ['v*']        # → upload + publish to production
+    branches: [main] # → upload to staging (unlisted)
+    tags: ["v*"] # → upload + publish to production
 ```
 
 Use `--trusted-testers` flag or `unlisted` visibility for staging builds.

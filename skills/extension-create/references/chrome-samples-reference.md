@@ -29,18 +29,18 @@ chrome-extensions-samples/
 
 ## Top 10 Most Useful Samples
 
-| Use Case | Sample Path | What it shows |
-|----------|------------|---------------|
-| Side panel (global) | `functional-samples/cookbook.sidepanel-global/` | Open sidepanel on all pages |
-| Side panel (per-tab) | `functional-samples/cookbook.sidepanel-navigate/` | Different panel per page |
-| Content script DOM | `api-samples/scripting/` | `chrome.scripting.executeScript` |
-| Storage sync | `api-samples/storage/` | `chrome.storage.sync` read/write |
-| Context menus | `api-samples/contextMenus/` | Right-click menu items |
-| Tab management | `functional-samples/sample.tab-manager/` | Full tab manager extension |
-| Page modification | `functional-samples/sample.page-redder/` | Content script + action |
-| Offscreen DOM | `functional-samples/cookbook.offscreen-dom/` | DOM access from SW |
-| Alarms/background | `api-samples/alarms/` | Periodic background tasks |
-| Message passing | `api-samples/runtime.sendMessage/` | Popup ↔ background ↔ content |
+| Use Case             | Sample Path                                       | What it shows                    |
+| -------------------- | ------------------------------------------------- | -------------------------------- |
+| Side panel (global)  | `functional-samples/cookbook.sidepanel-global/`   | Open sidepanel on all pages      |
+| Side panel (per-tab) | `functional-samples/cookbook.sidepanel-navigate/` | Different panel per page         |
+| Content script DOM   | `api-samples/scripting/`                          | `chrome.scripting.executeScript` |
+| Storage sync         | `api-samples/storage/`                            | `chrome.storage.sync` read/write |
+| Context menus        | `api-samples/contextMenus/`                       | Right-click menu items           |
+| Tab management       | `functional-samples/sample.tab-manager/`          | Full tab manager extension       |
+| Page modification    | `functional-samples/sample.page-redder/`          | Content script + action          |
+| Offscreen DOM        | `functional-samples/cookbook.offscreen-dom/`      | DOM access from SW               |
+| Alarms/background    | `api-samples/alarms/`                             | Periodic background tasks        |
+| Message passing      | `api-samples/runtime.sendMessage/`                | Popup ↔ background ↔ content     |
 
 ---
 
@@ -50,12 +50,12 @@ chrome-extensions-samples/
 2. Copy the core logic (not the manifest — WXT generates that)
 3. Place logic in the appropriate WXT entrypoint:
 
-   | Sample file | WXT entrypoint |
-   |-------------|---------------|
-   | `background.js` | `entrypoints/background.ts` |
-   | `content.js` | `entrypoints/content.ts` |
-   | `popup.html/.js` | `entrypoints/popup/` |
-   | `sidepanel.html/.js` | `entrypoints/sidepanel/` |
+   | Sample file          | WXT entrypoint              |
+   | -------------------- | --------------------------- |
+   | `background.js`      | `entrypoints/background.ts` |
+   | `content.js`         | `entrypoints/content.ts`    |
+   | `popup.html/.js`     | `entrypoints/popup/`        |
+   | `sidepanel.html/.js` | `entrypoints/sidepanel/`    |
 
 4. Replace `chrome.*` with `browser.*` (WXT cross-browser wrapper)
 5. Replace manifest permissions with `wxt.config.ts` manifest block
@@ -64,21 +64,21 @@ chrome-extensions-samples/
 
 ## Key API Categories (api-samples/)
 
-| Category | APIs covered |
-|----------|-------------|
-| `action/` | badge, icon, popup, title |
-| `alarms/` | create, clear, onAlarm |
-| `bookmarks/` | create, search, remove, onCreated |
-| `contextMenus/` | create, remove, onClicked |
-| `cookies/` | get, set, remove |
-| `declarativeNetRequest/` | block/redirect/modify requests |
-| `identity/` | OAuth2, getAuthToken |
-| `notifications/` | create, update, onClicked |
-| `offscreen/` | DOM, clipboard, audio |
-| `scripting/` | executeScript, insertCSS |
-| `storage/` | local, sync, session, onChanged |
-| `tabs/` | query, create, update, group |
-| `webNavigation/` | onCompleted, onHistoryStateUpdated |
+| Category                 | APIs covered                       |
+| ------------------------ | ---------------------------------- |
+| `action/`                | badge, icon, popup, title          |
+| `alarms/`                | create, clear, onAlarm             |
+| `bookmarks/`             | create, search, remove, onCreated  |
+| `contextMenus/`          | create, remove, onClicked          |
+| `cookies/`               | get, set, remove                   |
+| `declarativeNetRequest/` | block/redirect/modify requests     |
+| `identity/`              | OAuth2, getAuthToken               |
+| `notifications/`         | create, update, onClicked          |
+| `offscreen/`             | DOM, clipboard, audio              |
+| `scripting/`             | executeScript, insertCSS           |
+| `storage/`               | local, sync, session, onChanged    |
+| `tabs/`                  | query, create, update, group       |
+| `webNavigation/`         | onCompleted, onHistoryStateUpdated |
 
 ---
 

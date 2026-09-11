@@ -5,9 +5,12 @@ description: "Migrate Chrome extensions from MV2 to MV3. Service workers, declar
 
 # Extension Migration (MV2 → MV3)
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Official migration guide: https://developer.chrome.com/docs/extensions/develop/migrate
 
-> **Consider framework adoption**: When migrating MV2→MV3, consider adopting [WXT](https://wxt.dev/) or [Plasmo](https://docs.plasmo.com/) for built-in MV3 support, auto-manifest generation, and modern tooling.
+> **Consider framework adoption**: When migrating MV2→MV3, consider adopting [WXT](https://wxt.dev/) or [CRXJS](https://docs.crxjs.com/) for built-in MV3 support, auto-manifest generation, and modern tooling.
 
 ## Workflow Overview
 
@@ -23,18 +26,18 @@ Official migration guide: https://developer.chrome.com/docs/extensions/develop/m
 
 ## Key Breaking Changes
 
-| Area | MV2 | MV3 |
-|------|-----|-----|
-| Background | `background.scripts/page` | `background.service_worker` |
-| Browser action | `browser_action` / `page_action` | `action` |
-| Network blocking | `webRequest` (blocking) | `declarativeNetRequest` |
-| Script injection | `tabs.executeScript(string)` | `scripting.executeScript({func/files})` |
-| Remote code | CDN scripts allowed | Must bundle locally |
-| CSP | String value | Object `{extension_pages: "..."}` |
-| Web accessible | `string[]` | `object[]` with `matches` field |
-| Host permissions | In `permissions` array | Separate `host_permissions` array |
-| URL helper | `chrome.extension.getURL` | `chrome.runtime.getURL` |
-| Persistent storage | `localStorage` | `chrome.storage.local` |
+| Area               | MV2                              | MV3                                     |
+| ------------------ | -------------------------------- | --------------------------------------- |
+| Background         | `background.scripts/page`        | `background.service_worker`             |
+| Browser action     | `browser_action` / `page_action` | `action`                                |
+| Network blocking   | `webRequest` (blocking)          | `declarativeNetRequest`                 |
+| Script injection   | `tabs.executeScript(string)`     | `scripting.executeScript({func/files})` |
+| Remote code        | CDN scripts allowed              | Must bundle locally                     |
+| CSP                | String value                     | Object `{extension_pages: "..."}`       |
+| Web accessible     | `string[]`                       | `object[]` with `matches` field         |
+| Host permissions   | In `permissions` array           | Separate `host_permissions` array       |
+| URL helper         | `chrome.extension.getURL`        | `chrome.runtime.getURL`                 |
+| Persistent storage | `localStorage`                   | `chrome.storage.local`                  |
 
 ## Migration Priority Checklist
 

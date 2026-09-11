@@ -9,12 +9,12 @@ npm install -D sharp
 ## Script: scripts/generate-icons.js
 
 ```javascript
-const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
+const sharp = require("sharp");
+const fs = require("fs");
+const path = require("path");
 
-const SOURCE = process.argv[2] || 'icon.svg';
-const OUTPUT_DIR = process.argv[3] || 'public/icons';
+const SOURCE = process.argv[2] || "icon.svg";
+const OUTPUT_DIR = process.argv[3] || "public/icons";
 
 // Extension icons
 const EXTENSION_SIZES = [16, 32, 48, 128];
@@ -31,7 +31,10 @@ async function generateIcons() {
   for (const size of EXTENSION_SIZES) {
     const outputPath = path.join(OUTPUT_DIR, `icon${size}.png`);
     await sharp(sourceBuffer)
-      .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .resize(size, size, {
+        fit: "contain",
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
       .png()
       .toFile(outputPath);
     console.log(`Generated: ${outputPath} (${size}x${size})`);
@@ -41,13 +44,16 @@ async function generateIcons() {
   for (const size of ACTION_SIZES) {
     const outputPath = path.join(OUTPUT_DIR, `action${size}.png`);
     await sharp(sourceBuffer)
-      .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .resize(size, size, {
+        fit: "contain",
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
       .png()
       .toFile(outputPath);
     console.log(`Generated: ${outputPath} (${size}x${size})`);
   }
 
-  console.log('\nAll icons generated successfully.');
+  console.log("\nAll icons generated successfully.");
 }
 
 generateIcons().catch(console.error);

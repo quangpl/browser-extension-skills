@@ -64,22 +64,23 @@ Content scripts share the page's network context — visible in the page's **Net
 Service worker network calls appear in the **background DevTools Network** tab (inspect from `chrome://extensions`).
 
 For `declarativeNetRequest` rule testing:
+
 - `chrome://extensions` → Details → **"Test matched rules"** tool
 
 ---
 
 ## Common Errors and Quick Fixes
 
-| Error | Cause | Fix |
-|---|---|---|
-| `Cannot read properties of undefined (reading 'tabs')` | Missing `tabs` permission | Add `"tabs"` to `manifest.json` permissions |
-| `Extension context invalidated` | Extension reloaded mid-operation | Catch the error, retry after reconnect |
-| `Could not establish connection. Receiving end does not exist` | Content script not injected | Verify `matches` in manifest content_scripts or use `scripting.executeScript` |
-| `Service worker registration failed` | Syntax error in background.ts | Check background DevTools console |
-| `Unchecked runtime.lastError` | No listener on the other end | Add `.then()`/`sendResponse` listener or check `chrome.runtime.lastError` |
-| Popup closes immediately | JS error crashes it | Inspect popup before clicking — set DevTools to pause on exceptions |
-| Badge not showing | `action` not in manifest | Add `"action": {}` to manifest |
-| `Invalid manifest` on load | JSON syntax error | Validate manifest.json syntax |
+| Error                                                          | Cause                            | Fix                                                                           |
+| -------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------- |
+| `Cannot read properties of undefined (reading 'tabs')`         | Missing `tabs` permission        | Add `"tabs"` to `manifest.json` permissions                                   |
+| `Extension context invalidated`                                | Extension reloaded mid-operation | Catch the error, retry after reconnect                                        |
+| `Could not establish connection. Receiving end does not exist` | Content script not injected      | Verify `matches` in manifest content_scripts or use `scripting.executeScript` |
+| `Service worker registration failed`                           | Syntax error in background.ts    | Check background DevTools console                                             |
+| `Unchecked runtime.lastError`                                  | No listener on the other end     | Add `.then()`/`sendResponse` listener or check `chrome.runtime.lastError`     |
+| Popup closes immediately                                       | JS error crashes it              | Inspect popup before clicking — set DevTools to pause on exceptions           |
+| Badge not showing                                              | `action` not in manifest         | Add `"action": {}` to manifest                                                |
+| `Invalid manifest` on load                                     | JSON syntax error                | Validate manifest.json syntax                                                 |
 
 ---
 
@@ -89,13 +90,13 @@ Add a context prefix to every log to identify origin at a glance:
 
 ```ts
 // background.ts
-const log = (...args: unknown[]) => console.log('[BG]', ...args);
+const log = (...args: unknown[]) => console.log("[BG]", ...args);
 
 // content.ts
-const log = (...args: unknown[]) => console.log('[CS]', ...args);
+const log = (...args: unknown[]) => console.log("[CS]", ...args);
 
 // popup/main.tsx
-const log = (...args: unknown[]) => console.log('[POPUP]', ...args);
+const log = (...args: unknown[]) => console.log("[POPUP]", ...args);
 ```
 
 ---
@@ -113,11 +114,11 @@ const log = (...args: unknown[]) => console.log('[POPUP]', ...args);
 
 ## Hot Reload vs Manual Reload
 
-| Change type | Reload needed |
-|---|---|
-| Popup / options / side panel HTML+JS | Usually auto-reloaded by WXT/Plasmo HMR |
-| Content script | Page refresh required |
-| Service worker / manifest | Full extension reload at `chrome://extensions` |
-| Icons / static assets | Full extension reload |
+| Change type                          | Reload needed                                  |
+| ------------------------------------ | ---------------------------------------------- |
+| Popup / options / side panel HTML+JS | Usually auto-reloaded by WXT/CRXJS HMR         |
+| Content script                       | Page refresh required                          |
+| Service worker / manifest            | Full extension reload at `chrome://extensions` |
+| Icons / static assets                | Full extension reload                          |
 
 **Manual reload shortcut:** `chrome://extensions` → click the reload icon (circular arrow) on your extension card.
