@@ -83,7 +83,11 @@ convert -size 440x280 xc:"#4285f4" \
 
 Check for API key:
 ```bash
-echo $GEMINI_API_KEY
+if [ -n "${GEMINI_API_KEY:-}" ]; then
+  echo "GEMINI_API_KEY is set"
+else
+  echo "GEMINI_API_KEY is not set"
+fi
 ```
 
 If set, use `ai-multimodal` skill or call Gemini API directly. See `references/image-generation-prompts.md` for prompt templates.
