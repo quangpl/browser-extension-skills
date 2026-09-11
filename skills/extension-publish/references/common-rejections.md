@@ -7,6 +7,7 @@
 **Cause**: Extension does multiple unrelated things (e.g., ad blocker + password manager + tab organizer).
 
 **Fix**:
+
 - Define one primary purpose
 - Remove features unrelated to that purpose
 - Split into separate extensions if needed
@@ -19,6 +20,7 @@
 **Cause**: Requesting permissions not used or broader than needed.
 
 **Fix**:
+
 - Audit every permission — remove unused ones
 - Replace `<all_urls>` with specific domains where possible
 - Use `activeTab` instead of `tabs` + broad hosts when feasible
@@ -31,6 +33,7 @@
 **Cause**: Extension collects user data but no privacy policy URL provided.
 
 **Fix**:
+
 - Host policy at stable public URL (GitHub Pages, own domain)
 - Add URL in Developer Dashboard "Privacy practices" tab
 - Policy must cover: data collected, use, storage, sharing, deletion
@@ -42,6 +45,7 @@
 **Cause**: Sensitive permissions listed without explanation in submission form.
 
 **Fix**:
+
 - In submission form, fill "Permission justifications" for each flagged permission
 - Be specific: "We use `tabs` to detect the active tab URL to match ad rules"
 - One justification per permission, 1–3 sentences
@@ -53,6 +57,7 @@
 **Cause**: Extension behaves differently than described, or impersonates another product.
 
 **Fix**:
+
 - Rewrite description to match actual functionality exactly
 - Remove any claims that can't be demonstrated
 - Don't use competitor brand names misleadingly
@@ -65,6 +70,7 @@
 **Cause**: Title or description stuffed with keywords, repeated terms, or unrelated terms.
 
 **Fix**:
+
 - Remove repetitive keywords
 - Write naturally for users, not search engines
 - Each keyword should appear at most 2–3× in entire listing
@@ -76,6 +82,7 @@
 **Cause**: Extension loads and executes remote JavaScript, uses `eval()`, or `new Function()`.
 
 **Fix**:
+
 - Remove all `eval()` and `new Function()` calls
 - Bundle all logic into extension package
 - If dynamic content needed, use declarative approaches
@@ -88,6 +95,7 @@
 **Cause**: Collecting, selling, or transmitting user data without disclosure.
 
 **Fix**:
+
 - Declare all data collection in Dashboard "Privacy practices"
 - Never sell user data
 - Minimize data collection — only what's necessary
@@ -101,6 +109,7 @@
 **Cause**: Extension crashes, has JS errors, or core features don't work.
 
 **Fix**:
+
 - Test on fresh Chrome profile before every submission
 - Check `chrome://extensions` for errors after loading
 - Test in both normal and incognito mode
@@ -113,6 +122,7 @@
 **Cause**: Links 404, required sign-in blocks features, geoblocked content.
 
 **Fix**:
+
 - Test all external URLs used in extension
 - Provide test account credentials in submission notes if login required
 - Note any geographic restrictions in submission notes

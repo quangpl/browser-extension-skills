@@ -5,32 +5,38 @@ description: "Generate and manage all Chrome extension assets: icons (16–128px
 
 # Extension Assets (Icon & Image Generator)
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Generate all required icons and assets for a Chrome extension and CWS listing. Do NOT just explain — execute the workflow.
 
 ## Assets Checklist
 
 ### Extension Icons (required)
-| File | Size | Usage |
-|------|------|-------|
-| `icon16.png` | 16x16 | Favicon, context menus |
-| `icon32.png` | 32x32 | Windows taskbar |
-| `icon48.png` | 48x48 | Extensions management page |
+
+| File          | Size    | Usage                               |
+| ------------- | ------- | ----------------------------------- |
+| `icon16.png`  | 16x16   | Favicon, context menus              |
+| `icon32.png`  | 32x32   | Windows taskbar                     |
+| `icon48.png`  | 48x48   | Extensions management page          |
 | `icon128.png` | 128x128 | Installation dialog, CWS store icon |
 
 ### Action Icons (toolbar)
-| File | Size |
-|------|------|
+
+| File           | Size  |
+| -------------- | ----- |
 | `action16.png` | 16x16 |
 | `action24.png` | 24x24 |
 | `action32.png` | 32x32 |
 
 ### CWS Listing Assets
-| Asset | Size | Required? |
-|-------|------|-----------|
-| Screenshots | 1280x800 or 640x400 | Yes (1–5) |
-| Small promo tile | 440x280 | For featured placement |
-| Large promo tile | 920x680 | Optional |
-| Marquee promo tile | 1400x560 | Optional |
+
+| Asset              | Size                | Required?              |
+| ------------------ | ------------------- | ---------------------- |
+| Screenshots        | 1280x800 or 640x400 | Yes (1–5)              |
+| Small promo tile   | 440x280             | For featured placement |
+| Large promo tile   | 920x680             | Optional               |
+| Marquee promo tile | 1400x560            | Optional               |
 
 ## Workflow (Execute This)
 
@@ -40,6 +46,7 @@ Ask user: "Do you have a source logo? (SVG or PNG, min 512x512)"
 
 **If no source — generate SVG directly:**
 Create a clean, professional SVG icon. Design should be:
+
 - Simple geometric shapes (recognizable at 16x16)
 - Flat design, no gradients (clean at all sizes)
 - Natural, hand-crafted look (NOT AI-generated style)
@@ -57,6 +64,7 @@ node scripts/generate-icons.js
 See `references/icon-converter-script.md` for the full Node.js script using **sharp**.
 
 **Fallback (ImageMagick):**
+
 ```bash
 for size in 16 32 48 128; do
   convert -background none -resize ${size}x${size} icon.svg "public/icons/icon${size}.png"
@@ -82,6 +90,7 @@ convert -size 440x280 xc:"#4285f4" \
 ### Step 4: Gemini API generation (optional)
 
 Check for API key:
+
 ```bash
 echo $GEMINI_API_KEY
 ```

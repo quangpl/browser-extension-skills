@@ -13,7 +13,7 @@ entrypoints/background.ts
 ```ts
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
-    console.log('Extension installed');
+    console.log("Extension installed");
   });
 });
 ```
@@ -32,10 +32,10 @@ entrypoints/overlay.content.ts  # named: "overlay"
 
 ```ts
 export default defineContentScript({
-  matches: ['https://*.example.com/*'],
-  runAt: 'document_idle',        // 'document_start' | 'document_end' | 'document_idle'
+  matches: ["https://*.example.com/*"],
+  runAt: "document_idle", // 'document_start' | 'document_end' | 'document_idle'
   main() {
-    console.log('Content script running');
+    console.log("Content script running");
   },
 });
 ```
@@ -68,9 +68,14 @@ entrypoints/options/main.tsx
 Generates: `"options_ui": { "page": "options.html", "open_in_tab": true }`
 
 To open in-popup instead:
+
 ```ts
 // wxt.config.ts manifest override
-manifest: { options_ui: { open_in_tab: false } }
+manifest: {
+  options_ui: {
+    open_in_tab: false;
+  }
+}
 ```
 
 ---
@@ -87,6 +92,7 @@ Generates: `"side_panel": { "default_path": "sidepanel.html" }`
 Requires `permissions: ['sidePanel']` in wxt.config.ts manifest.
 
 Open programmatically:
+
 ```ts
 browser.sidePanel.open({ windowId });
 ```
@@ -110,24 +116,25 @@ entrypoints/content.css          # injected with content script
 ```
 
 Or import inside content script:
+
 ```ts
-import './styles.css';
+import "./styles.css";
 ```
 
 ---
 
 ## Entrypoint Naming Rules
 
-| File pattern | Type |
-|-------------|------|
-| `background.ts` | Service worker |
-| `*.content.ts` | Content script |
-| `content.ts` | Content script (default name) |
-| `popup/index.html` | Popup |
-| `options/index.html` | Options page |
-| `sidepanel/index.html` | Side panel |
-| `devtools/index.html` | DevTools panel |
-| `*.html` (other) | Unlisted page |
+| File pattern           | Type                          |
+| ---------------------- | ----------------------------- |
+| `background.ts`        | Service worker                |
+| `*.content.ts`         | Content script                |
+| `content.ts`           | Content script (default name) |
+| `popup/index.html`     | Popup                         |
+| `options/index.html`   | Options page                  |
+| `sidepanel/index.html` | Side panel                    |
+| `devtools/index.html`  | DevTools panel                |
+| `*.html` (other)       | Unlisted page                 |
 
 ---
 

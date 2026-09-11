@@ -23,7 +23,7 @@ Extension                    Backend                      Google
 
 ```typescript
 // services/api-client.ts
-const API_BASE = 'https://your-backend.com/api/v1';
+const API_BASE = "https://your-backend.com/api/v1";
 
 async function getAuthToken(): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -39,8 +39,8 @@ async function apiCall<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
       ...options.headers,
     },
   });
@@ -50,10 +50,11 @@ async function apiCall<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 // Usage
 export const api = {
-  verifyLicense: () => apiCall<{ active: boolean; plan: string }>('/license/verify'),
+  verifyLicense: () =>
+    apiCall<{ active: boolean; plan: string }>("/license/verify"),
   createCheckout: (plan: string) =>
-    apiCall<{ checkoutUrl: string }>('/checkout/create', {
-      method: 'POST',
+    apiCall<{ checkoutUrl: string }>("/checkout/create", {
+      method: "POST",
       body: JSON.stringify({ plan }),
     }),
 };
@@ -63,21 +64,21 @@ export const api = {
 
 ```typescript
 // license/license.controller.ts
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { LicenseService } from './license.service';
+import { Controller, Get, UseGuards, Req } from "@nestjs/common";
+import { AuthGuard } from "../auth/guards/auth.guard";
+import { LicenseService } from "./license.service";
 
-@Controller('license')
+@Controller("license")
 export class LicenseController {
   constructor(private licenseService: LicenseService) {}
 
-  @Get('verify')
+  @Get("verify")
   @UseGuards(AuthGuard)
   async verify(@Req() req) {
     const license = await this.licenseService.findActiveByUserId(req.user.sub);
     return {
       active: !!license,
-      plan: license?.plan ?? 'free',
+      plan: license?.plan ?? "free",
       expiresAt: license?.expiresAt ?? null,
     };
   }
@@ -90,9 +91,12 @@ export class LicenseController {
 // services/license-service.ts
 const CACHE_TTL = 3600000; // 1 hour
 
-export async function checkLicense(): Promise<{ active: boolean; plan: string }> {
+export async function checkLicense(): Promise<{
+  active: boolean;
+  plan: string;
+}> {
   // Check cache
-  const { licenseCache } = await chrome.storage.local.get('licenseCache');
+  const { licenseCache } = await chrome.storage.local.get("licenseCache");
   if (licenseCache && licenseCache.expiresAt > Date.now()) {
     return licenseCache;
   }
@@ -108,7 +112,7 @@ export async function checkLicense(): Promise<{ active: boolean; plan: string }>
     if (licenseCache && licenseCache.expiresAt > Date.now() - 86400000) {
       return licenseCache;
     }
-    return { active: false, plan: 'free' };
+    return { active: false, plan: "free" };
   }
 }
 ```
@@ -134,7 +138,7 @@ try {
   const license = await api.verifyLicense();
   updateUI(license);
 } catch (error) {
-  if (error.message.includes('401')) {
+  if (error.message.includes("401")) {
     // Token expired, re-authenticate
     chrome.identity.removeCachedAuthToken({ token: currentToken });
   } else {

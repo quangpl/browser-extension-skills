@@ -45,13 +45,18 @@ DNR uses declarative rules evaluated by the browser — no JS callback per reque
   }]
 }
 ```
+
 ```json
 // rules.json
 [
   {
-    "id": 1, "priority": 1,
+    "id": 1,
+    "priority": 1,
     "action": { "type": "block" },
-    "condition": { "urlFilter": "||ads.example.com", "resourceTypes": ["script"] }
+    "condition": {
+      "urlFilter": "||ads.example.com",
+      "resourceTypes": ["script"]
+    }
   }
 ]
 ```
@@ -61,37 +66,47 @@ DNR uses declarative rules evaluated by the browser — no JS callback per reque
 ```js
 // Block request
 await chrome.declarativeNetRequest.updateDynamicRules({
-  addRules: [{
-    id: 1, priority: 1,
-    action: { type: "block" },
-    condition: { urlFilter: "*://ads.example.com/*" }
-  }]
-})
+  addRules: [
+    {
+      id: 1,
+      priority: 1,
+      action: { type: "block" },
+      condition: { urlFilter: "*://ads.example.com/*" },
+    },
+  ],
+});
 
 // Remove rule
 await chrome.declarativeNetRequest.updateDynamicRules({
-  removeRuleIds: [1]
-})
+  removeRuleIds: [1],
+});
 ```
 
 ## Modifying Headers
 
 ```js
 await chrome.declarativeNetRequest.updateDynamicRules({
-  addRules: [{
-    id: 2, priority: 1,
-    action: {
-      type: "modifyHeaders",
-      requestHeaders: [
-        { header: "Origin", operation: "set", value: "https://example.com" }
-      ],
-      responseHeaders: [
-        { header: "Access-Control-Allow-Origin", operation: "set", value: "*" }
-      ]
+  addRules: [
+    {
+      id: 2,
+      priority: 1,
+      action: {
+        type: "modifyHeaders",
+        requestHeaders: [
+          { header: "Origin", operation: "set", value: "https://example.com" },
+        ],
+        responseHeaders: [
+          {
+            header: "Access-Control-Allow-Origin",
+            operation: "set",
+            value: "*",
+          },
+        ],
+      },
+      condition: { urlFilter: "https://api.example.com/*" },
     },
-    condition: { urlFilter: "https://api.example.com/*" }
-  }]
-})
+  ],
+});
 ```
 
 ## Redirect Rules
@@ -123,11 +138,11 @@ await chrome.declarativeNetRequest.updateDynamicRules({
 
 ## Rule Limits
 
-| Limit | Value |
-|-------|-------|
-| Max dynamic rules | 30,000 |
-| Max static rulesets | 100 |
-| Max enabled static rulesets | 50 |
+| Limit                          | Value   |
+| ------------------------------ | ------- |
+| Max dynamic rules              | 30,000  |
+| Max static rulesets            | 100     |
+| Max enabled static rulesets    | 50      |
 | Max static rules per extension | 300,000 |
 
 ## Migration Example: Block + Modify Headers
@@ -139,12 +154,32 @@ await chrome.declarativeNetRequest.updateDynamicRules({
 
 chrome.declarativeNetRequest.updateDynamicRules({
   addRules: [
-    { id: 1, priority: 1, action: { type: "block" },
-      condition: { urlFilter: "||ads.example.com", resourceTypes: ["script", "image"] } },
-    { id: 2, priority: 1, action: { type: "modifyHeaders",
-        responseHeaders: [{ header: "Access-Control-Allow-Origin", operation: "set", value: "*" }] },
-      condition: { urlFilter: "https://api.thirdparty.com/*" } }
-  ]
-})
+    {
+      id: 1,
+      priority: 1,
+      action: { type: "block" },
+      condition: {
+        urlFilter: "||ads.example.com",
+        resourceTypes: ["script", "image"],
+      },
+    },
+    {
+      id: 2,
+      priority: 1,
+      action: {
+        type: "modifyHeaders",
+        responseHeaders: [
+          {
+            header: "Access-Control-Allow-Origin",
+            operation: "set",
+            value: "*",
+          },
+        ],
+      },
+      condition: { urlFilter: "https://api.thirdparty.com/*" },
+    },
+  ],
+});
 ```
+
 > Use `declarativeNetRequestFeedback` + `onRuleMatchedDebug` for debugging only.

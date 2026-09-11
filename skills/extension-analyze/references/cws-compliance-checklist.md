@@ -9,6 +9,7 @@ CWS policy compliance for submission and maintenance.
 **Rule:** Extension must have a single purpose that is narrow and easy to understand.
 
 **Violations:**
+
 - Multiple unrelated features bundled together (e.g., ad blocker + password manager)
 - Features added post-approval that change the extension's purpose
 - Core functionality changed via remote configuration
@@ -32,16 +33,17 @@ jq '.description' manifest.json
 CWS reviewers require justification for sensitive permissions.
 
 **Permissions requiring written justification in listing:**
-| Permission | Why Required |
-|------------|-------------|
-| `tabs` | Document URL access, tab manipulation |
-| `history` | Browsing history access |
-| `bookmarks` | Bookmark read/write |
-| `cookies` | Cookie access |
-| `<all_urls>` | Access to all websites |
-| `webRequest` | Network request interception |
-| `management` | Extension management |
-| `debugger` | Chrome DevTools protocol |
+
+| Permission   | Why Required                          |
+| ------------ | ------------------------------------- |
+| `tabs`       | Document URL access, tab manipulation |
+| `history`    | Browsing history access               |
+| `bookmarks`  | Bookmark read/write                   |
+| `cookies`    | Cookie access                         |
+| `<all_urls>` | Access to all websites                |
+| `webRequest` | Network request interception          |
+| `management` | Extension management                  |
+| `debugger`   | Chrome DevTools protocol              |
 
 - [ ] Each sensitive permission justified in CWS "Permission Justification" field
 - [ ] No permissions requested that aren't actively used
@@ -52,6 +54,7 @@ CWS reviewers require justification for sensitive permissions.
 ## 3. Privacy Policy Requirements
 
 **Required when extension:**
+
 - Collects any user data (browsing history, form data, personal info)
 - Transmits data to external servers
 - Uses analytics (Google Analytics, Mixpanel, etc.)
@@ -78,12 +81,14 @@ In CWS Developer Dashboard → Privacy practices tab:
 ## 5. Code Readability (No Obfuscation)
 
 **Prohibited:**
+
 - Obfuscated/minified code without source maps
 - Base64-encoded executable logic
 - Dynamic code assembly from string fragments
 - Code that intentionally hides behavior from reviewers
 
 **Allowed:**
+
 - Minification (uglify/terser) with source maps submitted
 - Bundling (webpack/rollup/esbuild) — standard practice
 
@@ -109,6 +114,7 @@ ls .output/*.map dist/*.map 2>/dev/null
 - [ ] Version notes accurate in "What's new" field
 
 **Automatic rejection triggers:**
+
 - "Best", "#1", "Free" in title (superlatives)
 - Trademarked names without authorization (Chrome, Google, Gmail)
 - Misleading category selection
@@ -141,7 +147,6 @@ jq '.web_accessible_resources[]?.resources[]' manifest.json | grep "\.js$"
 # Check version format
 jq '.version' manifest.json   # must be A.B.C.D numeric only
 ```
-
 
 - [ ] `update_url` removed for CWS-hosted extensions (CWS manages updates)
 - [ ] Version number incremented for each update submission

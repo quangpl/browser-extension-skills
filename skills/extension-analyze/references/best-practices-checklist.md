@@ -15,11 +15,12 @@ Chrome extension best practices for performance, UX, accessibility, privacy, and
 - [ ] No synchronous `XMLHttpRequest` calls
 
 **Bundle size targets:**
-| Component | Target |
-|-----------|--------|
-| Popup JS | < 200 KB |
-| Background SW | < 100 KB |
-| Content script | < 50 KB |
+
+| Component           | Target              |
+| ------------------- | ------------------- |
+| Popup JS            | < 200 KB            |
+| Background SW       | < 100 KB            |
+| Content script      | < 50 KB             |
 | Total extension zip | < 10 MB (CWS limit) |
 
 ```bash
@@ -41,7 +42,7 @@ du -sh .output/**/* 2>/dev/null || du -sh dist/**/*
 
 ```ts
 // Point-of-use permission request pattern
-await chrome.permissions.request({ permissions: ['tabs'] });
+await chrome.permissions.request({ permissions: ["tabs"] });
 ```
 
 ---
@@ -81,8 +82,11 @@ await chrome.permissions.request({ permissions: ['tabs'] });
 
 ```ts
 // Error tracking setup
-import * as Sentry from '@sentry/browser';
-Sentry.init({ dsn: process.env.SENTRY_DSN, release: chrome.runtime.getManifest().version });
+import * as Sentry from "@sentry/browser";
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  release: chrome.runtime.getManifest().version,
+});
 ```
 
 ---

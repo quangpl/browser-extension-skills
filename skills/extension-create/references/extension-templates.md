@@ -24,10 +24,10 @@ Permissions: `['activeTab']` or `host_permissions: ['https://*.site.com/*']`
 
 ```ts
 export default defineContentScript({
-  matches: ['https://*.target-site.com/*'],
+  matches: ["https://*.target-site.com/*"],
   main() {
-    const el = document.createElement('div');
-    el.id = 'my-extension-overlay';
+    const el = document.createElement("div");
+    el.id = "my-extension-overlay";
     document.body.appendChild(el);
   },
 });
@@ -73,6 +73,7 @@ const results = await browser.bookmarks.search({ query });
 ```
 
 Keyboard shortcut in `wxt.config.ts`:
+
 ```ts
 manifest: { commands: { 'save-bookmark': { suggested_key: { default: 'Ctrl+Shift+B' }, description: 'Save page' } } }
 ```
@@ -87,10 +88,16 @@ Permissions: `['contextMenus', 'activeTab']`
 ```ts
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
-    browser.contextMenus.create({ id: 'search', title: 'Search "%s"', contexts: ['selection'] });
+    browser.contextMenus.create({
+      id: "search",
+      title: 'Search "%s"',
+      contexts: ["selection"],
+    });
   });
   browser.contextMenus.onClicked.addListener((info) => {
-    browser.tabs.create({ url: `https://google.com/search?q=${info.selectionText}` });
+    browser.tabs.create({
+      url: `https://google.com/search?q=${info.selectionText}`,
+    });
   });
 });
 ```
@@ -99,11 +106,11 @@ export default defineBackground(() => {
 
 ## Permission Summary
 
-| Template | permissions | host_permissions |
-|----------|------------|-----------------|
-| URL Reader | activeTab | — |
-| Page Modifier | activeTab | target domain |
-| Side Panel | sidePanel, storage, activeTab | — |
-| Tab Manager | tabs, storage | — |
-| Bookmark Manager | bookmarks, storage | — |
-| Context Menu | contextMenus, activeTab | — |
+| Template         | permissions                   | host_permissions |
+| ---------------- | ----------------------------- | ---------------- |
+| URL Reader       | activeTab                     | —                |
+| Page Modifier    | activeTab                     | target domain    |
+| Side Panel       | sidePanel, storage, activeTab | —                |
+| Tab Manager      | tabs, storage                 | —                |
+| Bookmark Manager | bookmarks, storage            | —                |
+| Context Menu     | contextMenus, activeTab       | —                |

@@ -10,7 +10,11 @@ Toolbar button opens a popup. No content script, no background logic.
   "name": "Simple Popup",
   "version": "1.0.0",
   "description": "Click the toolbar button to open a popup.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Open Popup"
@@ -31,20 +35,28 @@ Injects JS/CSS into matching pages. Communicates with background via messages.
   "name": "Content Script Extension",
   "version": "1.0.0",
   "description": "Modifies pages on example.com.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["https://*.example.com/*"],
-  "content_scripts": [{
-    "matches": ["https://*.example.com/*"],
-    "js": ["content.js"],
-    "css": ["content.css"],
-    "run_at": "document_idle"
-  }],
+  "content_scripts": [
+    {
+      "matches": ["https://*.example.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
   "background": { "service_worker": "background.js", "type": "module" },
-  "web_accessible_resources": [{
-    "resources": ["images/*"],
-    "matches": ["https://*.example.com/*"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*"],
+      "matches": ["https://*.example.com/*"]
+    }
+  ]
 }
 ```
 
@@ -60,7 +72,11 @@ Opens a persistent side panel alongside the browser.
   "name": "Side Panel Extension",
   "version": "1.0.0",
   "description": "Provides a persistent side panel for enhanced browsing.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "permissions": ["sidePanel", "storage", "activeTab"],
   "action": { "default_title": "Open Side Panel" },
   "side_panel": { "default_path": "sidepanel.html" },
@@ -69,6 +85,7 @@ Opens a persistent side panel alongside the browser.
 ```
 
 Background registers the side panel:
+
 ```js
 // background.js
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
@@ -86,7 +103,11 @@ Adds a custom panel to Chrome DevTools.
   "name": "DevTools Extension",
   "version": "1.0.0",
   "description": "Adds a custom panel to Chrome DevTools.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "devtools_page": "devtools.html",
   "permissions": ["storage"]
 }
@@ -96,6 +117,7 @@ Adds a custom panel to Chrome DevTools.
 <!-- devtools.html -->
 <script src="devtools.js"></script>
 ```
+
 ```js
 // devtools.js
 chrome.devtools.panels.create("My Panel", "icons/icon16.png", "panel.html");
@@ -113,7 +135,11 @@ Requests sensitive permissions only when user explicitly needs them.
   "name": "Optional Permissions Extension",
   "version": "1.0.0",
   "description": "Requests extra permissions only when needed.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "action": { "default_popup": "popup.html" },
   "permissions": ["storage"],
   "optional_permissions": ["tabs", "bookmarks"],
@@ -126,7 +152,7 @@ Requests sensitive permissions only when user explicitly needs them.
 async function requestOptionalPermissions() {
   const granted = await chrome.permissions.request({
     permissions: ["tabs"],
-    origins: ["https://*/*"]
+    origins: ["https://*/*"],
   });
   return granted;
 }

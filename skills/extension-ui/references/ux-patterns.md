@@ -18,6 +18,7 @@ Popup should be **useful in < 2 seconds**. Users open extensions with intent —
 ## Progressive Disclosure
 
 Show essentials first, details on demand:
+
 - Level 1: Status + primary action (always visible)
 - Level 2: Secondary actions (visible but not dominant)
 - Level 3: Settings / advanced (behind icon or link)
@@ -37,6 +38,7 @@ Browse any page and click the + button to save it."
 ```
 
 Rules:
+
 - Explain what will appear here
 - Give a clear first action
 - Include visual (icon or illustration if space allows)
@@ -73,6 +75,7 @@ Check your connection and try again."
 ```
 
 Rules:
+
 - Friendly language, no stack traces to user
 - Offer a clear recovery action
 - For auth errors → link to login/reconnect
@@ -90,6 +93,7 @@ Step 1/3: Pin the extension for quick access
 ```
 
 Rules:
+
 - One action per step
 - Show visual context (screenshot or animation)
 - Store completion in `chrome.storage.sync` (persists across devices)
@@ -104,6 +108,7 @@ Rules:
 - Link from popup: small gear icon → `chrome.runtime.openOptionsPage()`
 
 Group settings logically:
+
 ```
 Appearance: [Dark mode toggle] [Compact mode toggle]
 Behavior:   [Auto-open on startup] [Show notifications]
@@ -115,13 +120,15 @@ Account:    [Connected as user@email.com] [Sign out]
 ## Status Indicators
 
 **Badge on extension icon** (most prominent):
+
 ```js
-chrome.action.setBadgeText({ text: '3' });  // count
-chrome.action.setBadgeText({ text: '●' });  // dot indicator
-chrome.action.setBadgeBackgroundColor({ color: '#d93025' });  // red for error
+chrome.action.setBadgeText({ text: "3" }); // count
+chrome.action.setBadgeText({ text: "●" }); // dot indicator
+chrome.action.setBadgeBackgroundColor({ color: "#d93025" }); // red for error
 ```
 
 **Status bar in popup** (compact, 32-40px footer):
+
 ```tsx
 <footer className="flex items-center gap-2 px-3 py-2 border-t text-xs text-gray-500">
   <span className="w-2 h-2 rounded-full bg-green-500" />

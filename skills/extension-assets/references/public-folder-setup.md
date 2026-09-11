@@ -67,10 +67,12 @@ Declare any public assets accessed by content scripts:
 
 ```json
 {
-  "web_accessible_resources": [{
-    "resources": ["icons/*.png", "assets/*.css"],
-    "matches": ["<all_urls>"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png", "assets/*.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
 ```
 
@@ -112,12 +114,10 @@ Vite copies `public/` automatically. For webpack:
 
 ```js
 // webpack.config.js
-const CopyPlugin = require('copy-webpack-plugin')
+const CopyPlugin = require("copy-webpack-plugin");
 module.exports = {
-  plugins: [
-    new CopyPlugin({ patterns: [{ from: 'public', to: '.' }] })
-  ]
-}
+  plugins: [new CopyPlugin({ patterns: [{ from: "public", to: "." }] })],
+};
 ```
 
 ### Verify build output

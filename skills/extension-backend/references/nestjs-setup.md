@@ -6,10 +6,10 @@
 
 ```typescript
 // main.ts
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import helmet from 'helmet';
-import { AppModule } from './app.module';
+import { NestFactory } from "@nestjs/core";
+import { ValidationPipe } from "@nestjs/common";
+import helmet from "helmet";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,21 +18,23 @@ async function bootstrap() {
   app.use(helmet());
   app.enableCors({
     origin: [
-      /^chrome-extension:\/\//,       // All Chrome extensions (dev)
-      'chrome-extension://YOUR_EXT_ID' // Production: restrict to your ID
+      /^chrome-extension:\/\//, // All Chrome extensions (dev)
+      "chrome-extension://YOUR_EXT_ID", // Production: restrict to your ID
     ],
-    methods: ['GET', 'POST'],
+    methods: ["GET", "POST"],
     credentials: true,
   });
 
   // Validation
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,           // Strip unknown properties
-    forbidNonWhitelisted: true, // Throw on unknown properties
-    transform: true,            // Auto-transform types
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Strip unknown properties
+      forbidNonWhitelisted: true, // Throw on unknown properties
+      transform: true, // Auto-transform types
+    }),
+  );
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix("api/v1");
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
@@ -42,13 +44,13 @@ bootstrap();
 
 ```typescript
 // app.module.ts
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { AuthModule } from './auth/auth.module';
-import { LicenseModule } from './license/license.module';
-import { WebhookModule } from './webhook/webhook.module';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { MongooseModule } from "@nestjs/mongoose";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { AuthModule } from "./auth/auth.module";
+import { LicenseModule } from "./license/license.module";
+import { WebhookModule } from "./webhook/webhook.module";
 
 @Module({
   imports: [
@@ -56,7 +58,7 @@ import { WebhookModule } from './webhook/webhook.module';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        uri: config.get<string>('MONGODB_URI'),
+        uri: config.get<string>("MONGODB_URI"),
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 30 }]),
@@ -96,12 +98,14 @@ export default () => ({
 
 ```typescript
 // health.controller.ts
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get } from "@nestjs/common";
 
-@Controller('health')
+@Controller("health")
 export class HealthController {
   @Get()
-  check() { return { status: 'ok', timestamp: new Date().toISOString() }; }
+  check() {
+    return { status: "ok", timestamp: new Date().toISOString() };
+  }
 }
 ```
 

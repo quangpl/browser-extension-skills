@@ -5,6 +5,9 @@ description: "Build polished Chrome extension UIs (popup/sidepanel/options). Ana
 
 # Extension UI
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Build professional, polished Chrome extension interfaces. Do NOT just explain — execute the workflow.
 
 ## Workflow (Execute This)
@@ -19,6 +22,7 @@ Build professional, polished Chrome extension interfaces. Do NOT just explain �
 ### Step 2: Analyze existing UI
 
 If UI files exist:
+
 - Read component files for layout, spacing, color usage
 - Check for dark mode support (`prefers-color-scheme` or `class="dark"`)
 - Check accessibility: semantic HTML, aria-labels, focus management
@@ -28,17 +32,18 @@ Report findings: what's good, what needs improvement, priority fixes.
 
 ### Step 3: Recommend UI stack
 
-| Framework | Recommended Stack |
-|-----------|------------------|
-| React | shadcn/ui + Tailwind (best component quality) |
-| React (minimal) | Tailwind only + custom compact theme |
-| Vue | DaisyUI + Tailwind |
-| Svelte | Tailwind + svelte-headlessui |
-| Vanilla | Custom CSS with CSS variables |
+| Framework       | Recommended Stack                             |
+| --------------- | --------------------------------------------- |
+| React           | shadcn/ui + Tailwind (best component quality) |
+| React (minimal) | Tailwind only + custom compact theme          |
+| Vue             | DaisyUI + Tailwind                            |
+| Svelte          | Tailwind + svelte-headlessui                  |
+| Vanilla         | Custom CSS with CSS variables                 |
 
 ### Step 4: Implement improvements
 
 Apply fixes in priority order:
+
 1. Dark mode support (critical — many users use dark mode)
 2. Proper sizing constraints (see `references/extension-ui-constraints.md`)
 3. Typography and spacing for small surfaces
@@ -50,12 +55,12 @@ Apply fixes in priority order:
 
 ## Extension UI Constraints (Summary)
 
-| Surface | Size | Key Constraints |
-|---------|------|-----------------|
-| Popup | max 800x600px | Closes on outside click, no resize |
-| Sidepanel | 320-400px wide | Full height, persistent |
-| Options page | Full tab | Standard web page |
-| Content script UI | Injected | CSS isolation via shadow DOM |
+| Surface           | Size           | Key Constraints                    |
+| ----------------- | -------------- | ---------------------------------- |
+| Popup             | max 800x600px  | Closes on outside click, no resize |
+| Sidepanel         | 320-400px wide | Full height, persistent            |
+| Options page      | Full tab       | Standard web page                  |
+| Content script UI | Injected       | CSS isolation via shadow DOM       |
 
 Full details: `references/extension-ui-constraints.md`
 
@@ -67,9 +72,17 @@ Always implement dark mode. Extensions live in both light/dark browser themes.
 
 ```css
 /* CSS variables approach */
-:root { --bg: #ffffff; --text: #111827; --border: #e5e7eb; }
+:root {
+  --bg: #ffffff;
+  --text: #111827;
+  --border: #e5e7eb;
+}
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #1f2937; --text: #f9fafb; --border: #374151; }
+  :root {
+    --bg: #1f2937;
+    --text: #f9fafb;
+    --border: #374151;
+  }
 }
 ```
 
@@ -85,7 +98,7 @@ Store user preference override in `chrome.storage.sync`.
 - Font weights: 400 (body), 500 (label), 600 (heading)
 
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 ```
 
 ---
@@ -109,7 +122,11 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 - Always respect `prefers-reduced-motion`
 
 ```css
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
 ```
 
 ---

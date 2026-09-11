@@ -36,7 +36,7 @@ skills/
 All relevant skills should support both major extension frameworks:
 
 - [WXT](https://wxt.dev/) — multi-framework, file-based entrypoints
-- [Plasmo](https://docs.plasmo.com/) — React-first, auto-manifest, CSUI
+- [CRXJS](https://crxjs.dev/) — Vite plugin integration, standard setup
 
 Detect the user's framework and adapt accordingly.
 
@@ -62,9 +62,10 @@ Detect the user's framework and adapt accordingly.
 ### Reporting Issues
 
 Open an issue with:
+
 - Which skill has the problem
 - What you expected vs what happened
-- Extension framework you're using (WXT, Plasmo, vanilla)
+- Extension framework you're using (WXT, CRXJS, vanilla)
 
 ## Code of Conduct
 

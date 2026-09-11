@@ -5,6 +5,9 @@ description: "Audit Chrome extensions for security issues, best practice violati
 
 # Extension Analyze (Security & Compliance Auditor)
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Audit an existing Chrome extension. Do NOT just explain — execute the workflow.
 
 ## Workflow (Execute This)
@@ -12,10 +15,12 @@ Audit an existing Chrome extension. Do NOT just explain — execute the workflow
 ### Step 1: Locate extension root and detect framework
 
 Ask user for path if not provided. Detect framework:
+
 ```bash
-ls wxt.config.ts plasmo.config.ts vite.config.ts manifest.json 2>/dev/null
+ls wxt.config.ts crxjs.config.ts vite.config.ts manifest.json 2>/dev/null
 ```
-- **Plasmo**: manifest auto-generated; check `package.json` and `plasmo.config.ts` instead
+
+- **CRXJS**: manifest auto-generated; check `package.json` and `crxjs.config.ts` instead
 - **WXT**: check `wxt.config.ts` manifest section
 - **Vanilla/CRXJS**: check `manifest.json` directly
 
@@ -68,12 +73,12 @@ Output findings grouped by severity. See **Output Format** below.
 
 ## Severity Levels
 
-| Level | Criteria |
-|-------|----------|
+| Level        | Criteria                                                               |
+| ------------ | ---------------------------------------------------------------------- |
 | **Critical** | RCE, data exfiltration, remote code loading, eval with untrusted input |
-| **High** | XSS, missing sender validation, API keys in source, HTTP API calls |
-| **Medium** | Overly broad permissions, unsafe-inline CSP, sync storage secrets |
-| **Low** | Missing error handling, no TypeScript, console.log in production |
+| **High**     | XSS, missing sender validation, API keys in source, HTTP API calls     |
+| **Medium**   | Overly broad permissions, unsafe-inline CSP, sync storage secrets      |
+| **Low**      | Missing error handling, no TypeScript, console.log in production       |
 
 ---
 

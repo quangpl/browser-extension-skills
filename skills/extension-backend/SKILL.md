@@ -5,11 +5,15 @@ description: "Build backend APIs for Chrome extensions. NestJS + MongoDB (Mongoo
 
 # Extension Backend
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 Build a secure, maintainable backend API for a Chrome extension. Recommended stack: **NestJS + MongoDB (Mongoose)**.
 
 ## When to Activate
 
 Activate this skill when extension work requires:
+
 - License verification / payment webhooks
 - User authentication / account management
 - Data sync across devices
@@ -34,6 +38,7 @@ Activate this skill when extension work requires:
 ### Step 2: Fetch framework docs
 
 Use `docs-seeker` skill to fetch latest docs:
+
 - **NestJS**: https://docs.nestjs.com/
 - **Mongoose**: https://mongoosejs.com/docs/
 - **TypeScript style**: https://google.github.io/styleguide/tsguide.html
@@ -79,12 +84,12 @@ src/
 
 ### Step 5: Essential endpoints
 
-| Method | Endpoint | Purpose | Auth |
-|--------|----------|---------|------|
-| POST | `/auth/verify-token` | Verify Google OAuth token | No |
-| GET | `/license/verify` | Check user subscription status | Yes |
-| POST | `/webhook/stripe` | Receive payment events | Signature |
-| GET | `/health` | Health check | No |
+| Method | Endpoint             | Purpose                        | Auth      |
+| ------ | -------------------- | ------------------------------ | --------- |
+| POST   | `/auth/verify-token` | Verify Google OAuth token      | No        |
+| GET    | `/license/verify`    | Check user subscription status | Yes       |
+| POST   | `/webhook/stripe`    | Receive payment events         | Signature |
+| GET    | `/health`            | Health check                   | No        |
 
 ### Step 6: Security checklist
 

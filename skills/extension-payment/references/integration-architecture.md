@@ -47,9 +47,12 @@ async function getAuthToken(): Promise<string> {
 // In popup or options page
 async function startCheckout(plan: string) {
   const token = await getAuthToken();
-  const res = await fetch('https://your-api.com/create-checkout', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+  const res = await fetch("https://your-api.com/create-checkout", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ plan }),
   });
   const { checkoutUrl } = await res.json();
@@ -62,19 +65,19 @@ async function startCheckout(plan: string) {
 ```typescript
 async function checkLicense(): Promise<boolean> {
   // Check cache first
-  const cached = await chrome.storage.local.get('license');
+  const cached = await chrome.storage.local.get("license");
   if (cached.license?.expiresAt > Date.now()) return cached.license.active;
 
   // Verify with backend
   const token = await getAuthToken();
-  const res = await fetch('https://your-api.com/verify-license', {
-    headers: { 'Authorization': `Bearer ${token}` },
+  const res = await fetch("https://your-api.com/verify-license", {
+    headers: { Authorization: `Bearer ${token}` },
   });
   const license = await res.json();
 
   // Cache for 1 hour
   await chrome.storage.local.set({
-    license: { ...license, expiresAt: Date.now() + 3600000 }
+    license: { ...license, expiresAt: Date.now() + 3600000 },
   });
   return license.active;
 }
@@ -95,15 +98,15 @@ if (isPremium) {
 
 ```typescript
 // Express example - Stripe webhook
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const sig = req.headers['stripe-signature'];
+app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
+  const sig = req.headers["stripe-signature"];
   const event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
 
   switch (event.type) {
-    case 'checkout.session.completed':
+    case "checkout.session.completed":
       activateLicense(event.data.object.customer_email);
       break;
-    case 'customer.subscription.deleted':
+    case "customer.subscription.deleted":
       deactivateLicense(event.data.object.customer_email);
       break;
   }

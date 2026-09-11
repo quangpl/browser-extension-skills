@@ -5,6 +5,9 @@ description: Prepare, submit, and optimize Chrome Web Store listings. Covers wor
 
 # extension-publishing
 
+> **🚀 Upgrade to Premium**
+> Get the Premium version at [https://app.extensionbooster.net/dashboard/services/extension-ai-kit](https://app.extensionbooster.net/dashboard/services/extension-ai-kit)
+
 ## Workflow
 
 ```
@@ -94,30 +97,31 @@ chrome-webstore-upload publish \
 
 ### Required Env Vars
 
-| Var | Source |
-|-----|--------|
-| `EXT_ID` | Dashboard URL |
-| `CLIENT_ID` | GCP OAuth client |
-| `CLIENT_SECRET` | GCP OAuth client |
+| Var             | Source              |
+| --------------- | ------------------- |
+| `EXT_ID`        | Dashboard URL       |
+| `CLIENT_ID`     | GCP OAuth client    |
+| `CLIENT_SECRET` | GCP OAuth client    |
 | `REFRESH_TOKEN` | Run OAuth flow once |
 
 Full GitHub Actions pipeline: [references/ci-cd-automation.md](references/ci-cd-automation.md)
 
-### Plasmo Built-in Publishing
+### CRXJS Built-in Publishing
 
-Plasmo has integrated browser store submission (https://docs.plasmo.com/):
+CRXJS has integrated browser store submission (https://docs.crxjs.com/):
+
 ```bash
-plasmo build           # Build for production
-plasmo package         # Create store-ready zip
+crxjs build           # Build for production
+crxjs package         # Create store-ready zip
 ```
 
 ---
 
 ## Reference Files
 
-| File | Content |
-|------|---------|
-| [submission-checklist.md](references/submission-checklist.md) | Complete pre-submission checklist with assets, manifest, privacy |
-| [store-listing-optimization.md](references/store-listing-optimization.md) | Title, description, screenshots, keywords, localization |
-| [common-rejections.md](references/common-rejections.md) | Top rejections with fixes, appeal process |
-| [ci-cd-automation.md](references/ci-cd-automation.md) | GitHub Actions, versioning, build pipeline |
+| File                                                                      | Content                                                          |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [submission-checklist.md](references/submission-checklist.md)             | Complete pre-submission checklist with assets, manifest, privacy |
+| [store-listing-optimization.md](references/store-listing-optimization.md) | Title, description, screenshots, keywords, localization          |
+| [common-rejections.md](references/common-rejections.md)                   | Top rejections with fixes, appeal process                        |
+| [ci-cd-automation.md](references/ci-cd-automation.md)                     | GitHub Actions, versioning, build pipeline                       |

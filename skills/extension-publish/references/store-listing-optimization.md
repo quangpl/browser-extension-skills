@@ -57,16 +57,16 @@ Hook: state the problem you solve clearly.
 
 Choose the most **specific** applicable category:
 
-| Category | Use when |
-|----------|----------|
-| Productivity | Task management, focus, workflow tools |
-| Developer Tools | Code, debugging, web inspection |
-| Accessibility | Screen readers, contrast, input aids |
-| Shopping | Price compare, coupons, wishlists |
-| News & Weather | Content aggregation, feeds |
-| Social & Communication | Messaging, social media enhancements |
-| Entertainment | Media players, streaming tools |
-| Search Tools | Search enhancers, finders |
+| Category               | Use when                               |
+| ---------------------- | -------------------------------------- |
+| Productivity           | Task management, focus, workflow tools |
+| Developer Tools        | Code, debugging, web inspection        |
+| Accessibility          | Screen readers, contrast, input aids   |
+| Shopping               | Price compare, coupons, wishlists      |
+| News & Weather         | Content aggregation, feeds             |
+| Social & Communication | Messaging, social media enhancements   |
+| Entertainment          | Media players, streaming tools         |
+| Search Tools           | Search enhancers, finders              |
 
 ## Keyword Strategy
 

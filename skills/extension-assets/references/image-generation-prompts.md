@@ -39,6 +39,7 @@ Style: modern flat icon, Material Design inspired.
 ```
 
 **Example:**
+
 ```
 Flat design app icon for a Chrome browser extension called "TabSaver".
 It saves and restores browser tab sessions.
@@ -81,14 +82,17 @@ Style: modern SaaS product landing page aesthetic.
 ## Alternative Tools
 
 ### DALL-E (OpenAI)
+
 Use the same prompts above. Works well for icons and promo tiles.
 Best model: `dall-e-3`, size `1024x1024` for icons.
 
 ### Midjourney
+
 Append to any prompt: `--style flat --ar 1:1 --v 6` for icons.
 For banners: `--ar 11:7` (440x280 ratio).
 
 ### Canva
+
 1. New design → Custom size → enter exact pixels
 2. Use "Apps" → "Text to Image" with prompts above
 3. Export as PNG

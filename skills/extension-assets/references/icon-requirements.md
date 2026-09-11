@@ -2,20 +2,20 @@
 
 ## Required Sizes
 
-| Size | File | Where Chrome Uses It |
-|------|------|---------------------|
-| 16x16 | `icon16.png` | Favicon in address bar, context menus |
-| 32x32 | `icon32.png` | Windows taskbar, @2x display fallback |
-| 48x48 | `icon48.png` | Extensions management page (`chrome://extensions`) |
-| 128x128 | `icon128.png` | Installation dialog, Chrome Web Store listing |
+| Size    | File          | Where Chrome Uses It                               |
+| ------- | ------------- | -------------------------------------------------- |
+| 16x16   | `icon16.png`  | Favicon in address bar, context menus              |
+| 32x32   | `icon32.png`  | Windows taskbar, @2x display fallback              |
+| 48x48   | `icon48.png`  | Extensions management page (`chrome://extensions`) |
+| 128x128 | `icon128.png` | Installation dialog, Chrome Web Store listing      |
 
 ## Action (Toolbar) Icons
 
-| Size | Usage |
-|------|-------|
+| Size  | Usage                   |
+| ----- | ----------------------- |
 | 16x16 | Default toolbar display |
-| 24x24 | @1.5x displays |
-| 32x32 | @2x (Retina) displays |
+| 24x24 | @1.5x displays          |
+| 32x32 | @2x (Retina) displays   |
 
 Chrome auto-selects best size. Provide all three for sharp display on all screens.
 
@@ -66,14 +66,14 @@ convert -background none -density 300 logo.svg \
 ## Generation: sharp (Node.js)
 
 ```js
-import sharp from 'sharp'
+import sharp from "sharp";
 
-const sizes = [16, 32, 48, 128]
+const sizes = [16, 32, 48, 128];
 for (const size of sizes) {
-  await sharp('logo.svg')
+  await sharp("logo.svg")
     .resize(size, size)
     .png()
-    .toFile(`public/icons/icon${size}.png`)
+    .toFile(`public/icons/icon${size}.png`);
 }
 ```
 

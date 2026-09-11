@@ -4,8 +4,13 @@
 
 ```typescript
 // auth/guards/auth.guard.ts
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../auth.service';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { AuthService } from "../auth.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -13,11 +18,11 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.replace('Bearer ', '');
-    if (!token) throw new UnauthorizedException('Missing token');
+    const token = request.headers.authorization?.replace("Bearer ", "");
+    if (!token) throw new UnauthorizedException("Missing token");
 
     const user = await this.authService.verifyGoogleToken(token);
-    if (!user) throw new UnauthorizedException('Invalid token');
+    if (!user) throw new UnauthorizedException("Invalid token");
 
     request.user = user;
     return true;
@@ -29,8 +34,8 @@ export class AuthGuard implements CanActivate {
 
 ```typescript
 // auth/auth.service.ts
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
@@ -38,12 +43,12 @@ export class AuthService {
 
   async verifyGoogleToken(token: string) {
     const res = await fetch(
-      `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`,
     );
     if (!res.ok) return null;
 
     const payload = await res.json();
-    const clientId = this.config.get('GOOGLE_CLIENT_ID');
+    const clientId = this.config.get("GOOGLE_CLIENT_ID");
     if (payload.aud !== clientId) return null;
 
     return { email: payload.email, sub: payload.sub };
@@ -71,27 +76,36 @@ health() { return { status: 'ok' }; }
 
 ```typescript
 // webhook/webhook.controller.ts
-import { Controller, Post, Req, Res, Headers, RawBodyRequest } from '@nestjs/common';
-import Stripe from 'stripe';
+import {
+  Controller,
+  Post,
+  Req,
+  Res,
+  Headers,
+  RawBodyRequest,
+} from "@nestjs/common";
+import Stripe from "stripe";
 
-@Controller('webhook')
+@Controller("webhook")
 export class WebhookController {
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-  @Post('stripe')
+  @Post("stripe")
   async handleStripe(
     @Req() req: RawBodyRequest<Request>,
-    @Headers('stripe-signature') sig: string,
+    @Headers("stripe-signature") sig: string,
     @Res() res: Response,
   ) {
     try {
       const event = this.stripe.webhooks.constructEvent(
-        req.rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET
+        req.rawBody,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET,
       );
       await this.processEvent(event);
       res.status(200).json({ received: true });
     } catch (err) {
-      res.status(400).json({ error: 'Invalid signature' });
+      res.status(400).json({ error: "Invalid signature" });
     }
   }
 }
@@ -106,10 +120,10 @@ export class WebhookController {
 app.enableCors({
   origin: (origin, cb) => {
     const allowed = [/^chrome-extension:\/\//];
-    if (!origin || allowed.some(p => p.test(origin))) cb(null, true);
-    else cb(new Error('CORS blocked'));
+    if (!origin || allowed.some((p) => p.test(origin))) cb(null, true);
+    else cb(new Error("CORS blocked"));
   },
-  methods: ['GET', 'POST'],
+  methods: ["GET", "POST"],
   credentials: true,
 });
 ```
@@ -118,7 +132,7 @@ app.enableCors({
 
 ```typescript
 // common/dto/verify-license.dto.ts
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty } from "class-validator";
 
 export class VerifyLicenseDto {
   @IsEmail()

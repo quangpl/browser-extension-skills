@@ -9,7 +9,12 @@
 
 ```css
 /* popup.css — set explicit size */
-body { width: 360px; min-height: 480px; max-height: 580px; overflow: hidden; }
+body {
+  width: 360px;
+  min-height: 480px;
+  max-height: 580px;
+  overflow: hidden;
+}
 ```
 
 **Layout pattern**: vertical stack — header (40px) + scrollable content + footer (48px)
@@ -31,9 +36,22 @@ body { width: 360px; min-height: 480px; max-height: 580px; overflow: hidden; }
 
 ```css
 /* sidepanel root */
-html, body { width: 100%; height: 100vh; overflow: hidden; }
-.panel { display: flex; flex-direction: column; height: 100vh; }
-.panel-content { flex: 1; overflow-y: auto; padding: 12px; }
+html,
+body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
 ```
 
 **Layout pattern**: sticky header + scrollable content area + optional sticky footer
@@ -51,7 +69,11 @@ html, body { width: 100%; height: 100vh; overflow: hidden; }
 - **Behavior**: standard page navigation, can use `chrome.tabs.create`
 
 ```css
-.options-container { max-width: 720px; margin: 0 auto; padding: 24px; }
+.options-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
 ```
 
 **Layout pattern**: sidebar nav + main content (desktop), stacked (mobile if needed)
@@ -67,8 +89,8 @@ html, body { width: 100%; height: 100vh; overflow: hidden; }
 - **CSS isolation**: ALWAYS use Shadow DOM — host page styles will break your UI
 
 ```js
-const host = document.createElement('div');
-const shadow = host.attachShadow({ mode: 'closed' });
+const host = document.createElement("div");
+const shadow = host.attachShadow({ mode: "closed" });
 // Inject your styles and components into shadow root
 ```
 
@@ -99,11 +121,11 @@ const shadow = host.attachShadow({ mode: 'closed' });
 
 ## Performance Rules (All Surfaces)
 
-| Rule | Why |
-|------|-----|
-| No heavy animations in popup | Visible on open, janky if slow |
-| Minimize DOM nodes | Faster render, lower memory |
-| Use `chrome.storage` for instant data | Avoid async wait on first render |
-| Lazy-load non-critical components | Faster initial render |
-| Prefer CSS transitions over JS animations | GPU-composited, smoother |
-| Avoid layout thrash (batch DOM reads/writes) | Prevents jank |
+| Rule                                         | Why                              |
+| -------------------------------------------- | -------------------------------- |
+| No heavy animations in popup                 | Visible on open, janky if slow   |
+| Minimize DOM nodes                           | Faster render, lower memory      |
+| Use `chrome.storage` for instant data        | Avoid async wait on first render |
+| Lazy-load non-critical components            | Faster initial render            |
+| Prefer CSS transitions over JS animations    | GPU-composited, smoother         |
+| Avoid layout thrash (batch DOM reads/writes) | Prevents jank                    |

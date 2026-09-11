@@ -16,12 +16,12 @@
 
 ### Icons (PNG, no transparency issues)
 
-| Size | Use |
-|------|-----|
-| 16×16 | Favicon, extension list |
-| 32×32 | Windows taskbar |
-| 48×48 | Extensions management page |
-| 128×128 | Chrome Web Store listing |
+| Size    | Use                        |
+| ------- | -------------------------- |
+| 16×16   | Favicon, extension list    |
+| 32×32   | Windows taskbar            |
+| 48×48   | Extensions management page |
+| 128×128 | Chrome Web Store listing   |
 
 ### Screenshots
 
@@ -33,10 +33,10 @@
 
 ### Promotional Images (optional but recommended)
 
-| Size | Use |
-|------|-----|
-| 440×280 | Small tile |
-| 920×680 | Large tile |
+| Size     | Use                |
+| -------- | ------------------ |
+| 440×280  | Small tile         |
+| 920×680  | Large tile         |
 | 1400×560 | Marquee (featured) |
 
 ## Privacy Policy
