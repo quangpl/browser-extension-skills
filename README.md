@@ -14,7 +14,7 @@ Chrome & browser extensions with AI coding agents.
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg?style=flat-square)](LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-f97316.svg?style=flat-square)](https://developer.chrome.com/docs/extensions/develop/migrate)
 [![Skills](https://img.shields.io/badge/Skills-12-3b82f6.svg?style=flat-square)](#-skills-overview)
-[![Powered by](https://img.shields.io/badge/Powered%20by-Extension%20Booster-7c3aed.svg?style=flat-square)](https://extensionbooster.net/)
+[![Sponsored by](https://img.shields.io/badge/Sponsored%20by-Extension%20Booster-7c3aed.svg?style=flat-square)](https://extensionbooster.net/)
 
 **[Get Started](#-installation)** · **[Skills](#-skills-overview)** · **[Quick Start](#-quick-start)** · **[Documentation](#-skill-details)** · **[Contributing](CONTRIBUTING.md)**
 
@@ -70,7 +70,7 @@ Chrome & browser extensions with AI coding agents.
 
 ## ✨ Why These Skills?
 
-Built by [Extension Booster](https://extensionbooster.net/), these skills address the real pain points of Chrome extension development: scattered documentation, confusing permission warnings, multi-context debugging, and opaque Chrome Web Store reviews.
+Sponsored by [Extension Booster](https://extensionbooster.net/), these skills address the real pain points of Chrome extension development: scattered documentation, confusing permission warnings, multi-context debugging, and opaque Chrome Web Store reviews.
 
 They turn your AI coding agent into an extension development expert that can:
 
@@ -393,7 +393,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 <div align="center">
 
-### Powered by Extension Booster
+### Sponsored by Extension Booster
 
 <a href="https://extensionbooster.net/">
   <img src="https://extensionbooster.net/logo.webp" alt="Extension Booster" width="80" />
