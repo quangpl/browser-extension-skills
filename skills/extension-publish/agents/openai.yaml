@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Publish"
+  short_description: "Package, list, and ship Chrome Web Store releases and updates"
+  default_prompt: "Prepare my extension for the Chrome Web Store: build the zip, write the listing and privacy answers, and set up a release workflow."

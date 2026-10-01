@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Assets"
+  short_description: "Create extension icons, toolbar icons, and Chrome Web Store images"
+  default_prompt: "Create the icon set and Chrome Web Store screenshots and promo tile for my extension."

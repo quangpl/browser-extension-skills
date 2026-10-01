@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Create"
+  short_description: "Scaffold a new Chrome extension with WXT, build it, and load it unpacked"
+  default_prompt: "Create a new Chrome extension that shows the reading time of the current page in a popup."

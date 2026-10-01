@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Manifest"
+  short_description: "Generate and audit manifest.json with minimum permissions"
+  default_prompt: "Audit my extension's manifest permissions and cut them to the minimum the code needs."

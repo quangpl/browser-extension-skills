@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Review"
+  short_description: "Predict Chrome Web Store rejections with violation codes and fixes"
+  default_prompt: "Review my extension for Chrome Web Store rejection risks and save a report."

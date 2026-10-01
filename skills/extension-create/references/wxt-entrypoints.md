@@ -1,147 +1,150 @@
-# WXT Entrypoints
+# WXT Entrypoints and Starter Patterns
 
-WXT auto-detects entrypoints by file name in `entrypoints/`. No manual manifest editing needed.
+## Contents
+- Feature → entrypoint map
+- File naming
+- Background (service worker)
+- Content script
+- HTML pages: popup, options, side panel, others
+- Starter snippets by extension type
 
----
+Docs: https://wxt.dev/guide/essentials/entrypoints (content-script UI: https://wxt.dev/guide/essentials/content-scripts).
 
-## Background Service Worker
+## Feature → entrypoint map
 
-```
-entrypoints/background.ts
-```
+| Extension type / feature | Entrypoints | Typical permissions |
+|---|---|---|
+| Act on the current tab from a toolbar popup | `popup/` | `activeTab` (+ `scripting` to inject) |
+| Modify or read specific sites automatically | `content.ts` (or `<name>.content.ts`) | none extra; `matches` become host access |
+| Persistent assistant UI beside pages | `sidepanel/` + `background.ts` | `sidePanel` (added by WXT) |
+| Tab / window manager | `popup/` + `background.ts` | `tabs` (only if reading other tabs' URL/title), `tabGroups` |
+| Right-click actions | `background.ts` | `contextMenus`, `activeTab` |
+| Keyboard shortcut | `background.ts` + `manifest.commands` | none |
+| Settings | `options/` | `storage` |
+| Periodic work / sync | `background.ts` | `alarms`, `storage` |
+| New tab replacement | `newtab/` | none |
+| DevTools panel | `devtools/` (+ unlisted panel page) | none |
+
+Store state with `storage` (WXT's typed wrapper over `chrome.storage`), not service-worker globals: the service worker is terminated when idle.
+
+## File naming
+
+An entrypoint is a file or a folder with an `index.*`, exactly one level inside `entrypoints/`. Related files (components, CSS) go inside the entrypoint's folder.
+
+| Path | Becomes |
+|---|---|
+| `background.ts` / `background/index.ts` | service worker |
+| `content.ts`, `<name>.content.ts`, `<name>.content/index.ts` | content script |
+| `popup.html` / `popup/index.html` | `action.default_popup` |
+| `options.html` / `options/index.html` | `options_ui` |
+| `sidepanel.html`, `<name>.sidepanel.html` (or folders) | `side_panel` |
+| `newtab`, `history`, `bookmarks` (`.html` or folder) | `chrome_url_overrides` |
+| `devtools.html` / `devtools/index.html` | `devtools_page` |
+| `sandbox.html`, `<name>.sandbox.html` | sandboxed page |
+| any other `*.html` | unlisted page at `browser.runtime.getURL('/<name>.html')` |
+| any other `*.ts` (with `defineUnlistedScript`) | unlisted script at `/<name>.js` |
+| any other `*.css` | unlisted CSS |
+
+## Background (service worker)
 
 ```ts
 export default defineBackground(() => {
-  browser.runtime.onInstalled.addListener(() => {
-    console.log('Extension installed');
+  browser.runtime.onInstalled.addListener(({ reason }) => {
+    if (reason === 'install') browser.runtime.openOptionsPage();
   });
 });
 ```
 
-Generates: `"background": { "service_worker": "background.js", "type": "module" }`
+Object form accepts `type: 'module'`, `include` / `exclude` (browser lists), and `main()`. `main` cannot be async; register listeners synchronously so they survive service-worker restarts.
 
----
-
-## Content Script
-
-```
-entrypoints/content.ts          # matches all pages by default
-entrypoints/content/index.ts    # same, folder form
-entrypoints/overlay.content.ts  # named: "overlay"
-```
+## Content script
 
 ```ts
 export default defineContentScript({
   matches: ['https://*.example.com/*'],
-  runAt: 'document_idle',        // 'document_start' | 'document_end' | 'document_idle'
-  main() {
-    console.log('Content script running');
+  runAt: 'document_idle',            // default; or document_start / document_end
+  // allFrames, world: 'MAIN', excludeMatches, cssInjectionMode, registration: 'runtime'
+  main(ctx) {
+    const badge = document.createElement('div');
+    badge.textContent = 'Hello from the extension';
+    document.body.append(badge);
+    ctx.onInvalidated(() => badge.remove()); // runs when the extension reloads/updates
   },
 });
 ```
 
-Generates: `content_scripts` array in manifest.
+CSS: `import './style.css'` inside a `<name>.content/` folder entrypoint and WXT adds it to the manifest. For framework UI injected into pages, use `createShadowRootUi` with `cssInjectionMode: 'ui'` so page styles don't leak in.
 
----
+## HTML pages
 
-## Popup
+Popup, options, side panel and override pages are an `index.html` plus a script:
 
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tab Sorter</title> <!-- popup: becomes action.default_title -->
+    <!-- options: <meta name="manifest.open_in_tab" content="true" /> (default false = embedded) -->
+    <!-- side panel: <meta name="manifest.open_at_install" content="true" /> (Firefox sidebar) -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
 ```
-entrypoints/popup/index.html
-entrypoints/popup/main.tsx
-entrypoints/popup/App.tsx
-```
+For other React pages, copy the template's `popup/main.tsx` (`ReactDOM.createRoot(...).render(<App />)`).
 
-`index.html` must include `<script type="module" src="./main.tsx"></script>`.
+## Starter snippets by extension type
 
-Generates: `"action": { "default_popup": "popup.html" }`
+Read the current tab from a popup (`activeTab` is granted when the popup opens):
 
----
-
-## Options Page
-
-```
-entrypoints/options/index.html
-entrypoints/options/main.tsx
-```
-
-Generates: `"options_ui": { "page": "options.html", "open_in_tab": true }`
-
-To open in-popup instead:
 ```ts
-// wxt.config.ts manifest override
-manifest: { options_ui: { open_in_tab: false } }
+async function readActiveTabTitle() {
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.id) return;
+  const [injection] = await browser.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: () => document.title,        // runs in the page; needs `scripting`
+  });
+  return injection?.result;
+}
 ```
 
----
+Side panel opened from the toolbar icon (no popup entrypoint; add `manifest: { action: {} }` so the icon exists):
 
-## Side Panel
-
-```
-entrypoints/sidepanel/index.html
-entrypoints/sidepanel/main.tsx
-```
-
-Generates: `"side_panel": { "default_path": "sidepanel.html" }`
-
-Requires `permissions: ['sidePanel']` in wxt.config.ts manifest.
-
-Open programmatically:
 ```ts
-browser.sidePanel.open({ windowId });
+export default defineBackground(() => {
+  browser.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
+});
 ```
 
----
+Context menu on selected text:
 
-## Unlisted Pages (not in manifest)
-
-```
-entrypoints/welcome/index.html   # accessible but not linked from manifest
-```
-
-Access at: `chrome-extension://<id>/welcome.html`
-
----
-
-## CSS Entrypoints (content script CSS)
-
-```
-entrypoints/content.css          # injected with content script
-```
-
-Or import inside content script:
 ```ts
-import './styles.css';
+export default defineBackground(() => {
+  browser.runtime.onInstalled.addListener(() => {
+    browser.contextMenus.create({ id: 'search', title: 'Search "%s"', contexts: ['selection'] });
+  });
+  browser.contextMenus.onClicked.addListener((info) => {
+    if (info.menuItemId !== 'search' || !info.selectionText) return;
+    browser.tabs.create({ url: `https://www.google.com/search?q=${encodeURIComponent(info.selectionText)}` });
+  });
+});
 ```
 
----
+Keyboard shortcut (`wxt.config.ts` `manifest.commands`, handled in the service worker):
 
-## Entrypoint Naming Rules
-
-| File pattern | Type |
-|-------------|------|
-| `background.ts` | Service worker |
-| `*.content.ts` | Content script |
-| `content.ts` | Content script (default name) |
-| `popup/index.html` | Popup |
-| `options/index.html` | Options page |
-| `sidepanel/index.html` | Side panel |
-| `devtools/index.html` | DevTools panel |
-| `*.html` (other) | Unlisted page |
-
----
-
-## Manifest Generation
-
-WXT reads each entrypoint's `defineXxx()` call metadata and generates `manifest.json` at build time. To inspect:
-
-```bash
-pnpm build
-cat .output/chrome-mv3/manifest.json
+```ts
+manifest: { commands: { 'save-page': { suggested_key: { default: 'Ctrl+Shift+S', mac: 'Command+Shift+S' }, description: 'Save page' } } }
+// background: browser.commands.onCommand.addListener((name, tab) => { if (name === 'save-page') … });
 ```
 
----
+Typed persistent setting shared by popup, options and service worker:
 
-## Docs
-
-- https://wxt.dev/guide/entrypoints/
+```ts
+// utils/settings.ts (auto-imported everywhere)
+export const enabled = storage.defineItem<boolean>('sync:enabled', { fallback: true });
+// await enabled.getValue(); await enabled.setValue(false); enabled.watch((v) => …);
+```

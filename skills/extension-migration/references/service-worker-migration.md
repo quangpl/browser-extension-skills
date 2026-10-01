@@ -1,150 +1,150 @@
-# Service Worker Migration Guide
+# Background page → service worker
 
-## Core Constraint: No DOM, No Window
+## Contents
+- Lifetime rules
+- Listener registration
+- State: globals → storage
+- Timers → alarms
+- DOM work → offscreen document
+- Migrating existing localStorage data
+- getBackgroundPage → messaging
+- Modules and imports
 
-Service workers run in a separate context. Remove all DOM API usage.
+Sources: [Migrate to a service worker](https://developer.chrome.com/docs/extensions/develop/migrate/to-service-workers), [Service worker lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle), [chrome.offscreen](https://developer.chrome.com/docs/extensions/reference/api/offscreen).
 
-```js
-// MV2 background.js - INVALID in MV3
-document.getElementById("foo")          // ❌ no document
-window.myGlobalVar = {}                  // ❌ no window
-new XMLHttpRequest()                     // ❌ use fetch
+## Lifetime rules
+
+Chrome stops the extension service worker when:
+- it has been idle for 30 s (receiving an event or calling an extension API resets the timer);
+- a single event or API call takes longer than 5 min;
+- a `fetch()` response takes longer than 30 s to arrive.
+
+Things that extend lifetime: extension API calls and events, messages on an open WebSocket, messages over a `runtime.connect` port, messages from an offscreen document, an active `chrome.debugger` session, a `connectNative` port. Prompting APIs (`permissions.request`, `identity.launchWebAuthFlow`, `desktopCapture.chooseDesktopMedia`, `management.uninstall`) may exceed 5 min.
+
+Drop MV2-era keep-alive hacks (30-second alarm pings, reconnecting ports, offscreen pings). Persist state instead and let the worker restart. If the code relies on newer lifetime behavior, set `minimum_chrome_version` accordingly.
+
+## Listener registration
+
+Register listeners synchronously at the top level. When Chrome wakes the worker for an event, it runs the script once and dispatches only to listeners that exist by the end of that first run.
+
+```ts
+// MV2 pattern that breaks in MV3: listener added after async work
+chrome.storage.local.get("config", ({ config }) => {
+  if (config.enabled) chrome.tabs.onUpdated.addListener(onTabUpdated);
+});
+
+// MV3: always register, check config inside
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  const { config } = await chrome.storage.local.get("config");
+  if (config?.enabled) onTabUpdated(tabId, info, tab);
+});
 ```
 
-## localStorage → chrome.storage.local
+One-time setup (context menus, default settings, alarms) goes in `runtime.onInstalled`, which also fires on extension and Chrome updates. Setup that is lost on browser restart (DNR session rules, `storage.session` defaults) also needs `runtime.onStartup`.
 
-```js
-// MV2
-localStorage.setItem("key", value)
-const val = localStorage.getItem("key")
+`runtime.onMessage` handlers that reply asynchronously call `sendResponse` and `return true`. Returning a promise (async listener) works only from Chrome 148; in older Chrome an `async` listener closes the channel before replying.
 
-// MV3
-await chrome.storage.local.set({ key: value })
-const { key } = await chrome.storage.local.get("key")
-```
+## State: globals → storage
 
-## XMLHttpRequest → fetch
+| MV2 background state | MV3 home |
+|---|---|
+| In-memory cache, session tokens, per-tab bookkeeping | `chrome.storage.session` (memory-backed, cleared on browser restart; not exposed to content scripts by default) |
+| Settings, user data | `chrome.storage.local` (or `sync` for small settings) |
+| Large/structured data, blobs | IndexedDB (available in the worker) |
+| `localStorage` / `sessionStorage` | Not available in the worker; use the above |
 
-```js
-// MV2
-const xhr = new XMLHttpRequest()
-xhr.open("GET", url)
-xhr.onload = () => console.log(xhr.responseText)
-xhr.send()
-
-// MV3
-const response = await fetch(url)
-const data = await response.text()
-```
-
-## setInterval / setTimeout → chrome.alarms
-
-Service workers terminate when idle; timers do not survive.
-
-```js
-// MV2
-setInterval(() => syncData(), 5 * 60 * 1000)
-
-// MV3
-chrome.alarms.create("syncData", { periodInMinutes: 5 })
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "syncData") syncData()
-})
-```
-> Note: `chrome.alarms` minimum period is 30 seconds (Chrome 120+).
-
-## Handling Idle Termination: State Persistence
-
-SW can terminate at any time. Persist all state.
-
-```js
-// MV2 - in-memory state (lost on terminate in MV3)
-let pendingRequests = []
-
-// MV3 - persist to storage
-async function addPendingRequest(req) {
-  const { pendingRequests = [] } = await chrome.storage.local.get("pendingRequests")
-  pendingRequests.push(req)
-  await chrome.storage.local.set({ pendingRequests })
+```ts
+// MV2: let pending = [];  — lost when the worker stops
+async function addPending(item: Item) {
+  const { pending = [] } = await chrome.storage.session.get("pending");
+  await chrome.storage.session.set({ pending: [...pending, item] });
 }
 ```
 
-## Event Listener Registration
+Read state at the start of each event handler instead of caching it at startup, or cache with a lazily initialized promise that is re-created after restart.
 
-Must be top-level and synchronous — not inside callbacks or async blocks.
+## Timers → alarms
 
-```js
-// ❌ WRONG - listener may not register if SW restarts
-chrome.storage.local.get("config", (config) => {
-  if (config.enabled) {
-    chrome.tabs.onUpdated.addListener(handler)  // too late
-  }
-})
+`setTimeout`/`setInterval` die with the worker. Short in-handler delays (a few seconds) are fine; anything periodic or longer uses alarms.
 
-// ✓ CORRECT - top-level, synchronous
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  const { config } = await chrome.storage.local.get("config")
-  if (config.enabled) handler(tabId, changeInfo, tab)
-})
-```
-
-## IndexedDB in Service Workers
-
-IndexedDB works; wrap in Promise for async/await.
-
-```js
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open("myDB", 1)
-    req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error)
-  })
+```ts
+async function ensureAlarms() {
+  if (!(await chrome.alarms.get("sync"))) await chrome.alarms.create("sync", { periodInMinutes: 5 });
 }
-const db = await openDB()
+chrome.runtime.onInstalled.addListener(ensureAlarms);
+chrome.runtime.onStartup.addListener(ensureAlarms);
+chrome.alarms.onAlarm.addListener((a) => { if (a.name === "sync") void syncData(); });
 ```
 
-## WebSocket / Persistent Connections
+- Needs the `"alarms"` permission. Minimum `periodInMinutes`/`delayInMinutes` is 0.5 (30 s); smaller values are not honored and log a warning.
+- Alarms are cleared on extension update (so the MV3 release starts with none) and may be cleared on browser restart. Create them in `runtime.onInstalled`, and in `runtime.onStartup` re-create any that `chrome.alarms.get()` doesn't return.
 
-Service workers cannot hold persistent connections. Use offscreen documents or relay via content scripts.
+## DOM work → offscreen document
 
-```js
-// MV3 - use offscreen document for long-lived WebSocket
-chrome.offscreen.createDocument({
-  url: "offscreen.html",
-  reasons: ["WEBSOCKET"],
-  justification: "Maintain WebSocket connection"
-})
-// communicate via chrome.runtime.sendMessage
-```
+The worker has no `document`, `window`, `DOMParser`, `Audio`, canvas-on-DOM, or `navigator.clipboard` write access. Move that code to an offscreen document. Only `chrome.runtime` is available inside it; talk to it via messages.
 
-## Keeping Service Worker Alive (Workaround)
+```ts
+// service worker
+const OFFSCREEN = "offscreen.html";
 
-For critical operations, use alarms to re-register or reconnect.
+async function ensureOffscreen() {
+  const contexts = await chrome.runtime.getContexts({
+    contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT],
+    documentUrls: [chrome.runtime.getURL(OFFSCREEN)],
+  });
+  if (contexts.length) return;
+  await chrome.offscreen.createDocument({
+    url: OFFSCREEN,
+    reasons: [chrome.offscreen.Reason.DOM_PARSER],
+    justification: "Parse fetched HTML",
+  });
+}
 
-```js
-// Heartbeat to prevent premature termination during long operations
-chrome.alarms.create("keepAlive", { periodInMinutes: 0.5 })
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "keepAlive") { /* no-op, just keep alive */ }
-})
-```
-
-## Complete Migration Pattern
-
-```js
-// MV3 service_worker (background.js)
-
-// 1. All event listeners at top level
-chrome.runtime.onInstalled.addListener(onInstalled)
-chrome.alarms.onAlarm.addListener(onAlarm)
-chrome.runtime.onMessage.addListener(onMessage)
-
-// 2. Async handlers persist state via storage, use alarms for periodic work
-async function onInstalled() { await chrome.storage.local.set({ initialized: true }) }
-async function onAlarm(alarm) {
-  if (alarm.name === "sync") {
-    const data = await (await fetch("https://api.example.com/data")).json()
-    await chrome.storage.local.set({ data })
-  }
+export async function parseTitle(html: string): Promise<string> {
+  await ensureOffscreen();
+  return chrome.runtime.sendMessage({ target: "offscreen", type: "parse-title", html });
 }
 ```
+
+```ts
+// offscreen.ts (loaded by offscreen.html)
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (msg.target !== "offscreen" || msg.type !== "parse-title") return;
+  const doc = new DOMParser().parseFromString(msg.html, "text/html");
+  sendResponse(doc.title);
+});
+```
+
+- Requires `"offscreen"` permission; one offscreen document per extension at a time; close it with `chrome.offscreen.closeDocument()` when done.
+- Reasons include `AUDIO_PLAYBACK`, `BLOBS`, `CLIPBOARD`, `DOM_PARSER`, `DOM_SCRAPING`, `IFRAME_SCRIPTING`, `LOCAL_STORAGE`, `USER_MEDIA`, `DISPLAY_MEDIA`, `WEB_RTC`, `WORKERS`, `BATTERY_STATUS`, `MATCH_MEDIA`, `GEOLOCATION`, `TESTING`. There is no WebSocket reason: open WebSockets directly in the worker (they extend its lifetime).
+
+## Migrating existing localStorage data
+
+Users updating from MV2 have data in the old background page's `localStorage`. The worker cannot read it, but an offscreen document on the same origin can.
+
+```ts
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (reason !== "update") return;
+  const { migrated } = await chrome.storage.local.get("migrated");
+  if (migrated) return;
+  await chrome.offscreen.createDocument({
+    url: "migrate.html",
+    reasons: [chrome.offscreen.Reason.LOCAL_STORAGE],
+    justification: "Move MV2 localStorage data to chrome.storage",
+  });
+  const data: Record<string, string> = await chrome.runtime.sendMessage({ type: "dump-local-storage" });
+  await chrome.storage.local.set({ ...data, migrated: true });
+  await chrome.offscreen.closeDocument();
+});
+// migrate.ts replies with Object.fromEntries(Object.entries(localStorage)), parsing JSON values as needed.
+```
+
+## getBackgroundPage → messaging
+
+Popup/options code that called `chrome.extension.getBackgroundPage().someFn()` or read its globals now sends `chrome.runtime.sendMessage({ type: "get-status" })` and the worker replies from a top-level `onMessage` listener. Shared state is read from `chrome.storage` directly by either side; for live updates the popup listens to `chrome.storage.onChanged` instead of polling the worker.
+
+## Modules and imports
+
+- `"background": { "service_worker": "bg.js", "type": "module" }` enables static `import`. Dynamic `import()` is not supported in extension service workers; bundle instead.
+- Classic workers use `importScripts("a.js")` at the top level only.
+- Multiple MV2 `background.scripts` files: concatenate via the bundler or `importScripts` them in order.

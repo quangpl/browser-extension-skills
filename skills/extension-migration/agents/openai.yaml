@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Migration"
+  short_description: "Migrate a Manifest V2 extension to MV3 and verify every feature"
+  default_prompt: "Migrate my Manifest V2 Chrome extension to Manifest V3 and list any behavior that changed."

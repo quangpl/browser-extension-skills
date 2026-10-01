@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Dev"
+  short_description: "Build features and fix bugs in an existing Chrome MV3 extension"
+  default_prompt: "Add a context-menu action to my extension that saves the selected text, and verify it works in the service worker console."

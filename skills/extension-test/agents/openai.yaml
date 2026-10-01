@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Test"
+  short_description: "Unit, integration, and Playwright E2E tests for Chrome extensions"
+  default_prompt: "Add tests for my Chrome extension's popup and service worker messaging, then run them."

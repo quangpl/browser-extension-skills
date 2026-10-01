@@ -1,138 +1,146 @@
 # Provider Quickstarts
 
-## Stripe (Gateway)
+## Contents
+- Stripe (gateway, or MoR via Managed Payments) · Paddle Billing · Polar · Dodo Payments · Creem
+- ExtensionPay (no backend) · Lemon Squeezy (existing integrations)
 
-**Docs**: https://docs.stripe.com | **llms.txt**: https://docs.stripe.com/llms.txt
+Server snippets assume Express with `express.raw({ type: 'application/json' })` on the webhook route; signature checks fail on a re-parsed JSON body. Each provider's llms.txt (listed below) has the current call shapes — check them before shipping.
 
-```bash
-npm install stripe                    # Backend
-```
+## Stripe
 
-**Backend setup:**
-```typescript
+`npm i stripe` · https://docs.stripe.com · llms.txt https://docs.stripe.com/llms.txt
+
+```ts
 import Stripe from 'stripe';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Create checkout session
-app.post('/create-checkout', async (req, res) => {
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription', // or 'payment' for one-time
-    line_items: [{ price: 'price_xxx', quantity: 1 }],
-    success_url: 'https://yourapp.com/success',
-    cancel_url: 'https://yourapp.com/cancel',
-    customer_email: req.user.email,
-  });
-  res.json({ checkoutUrl: session.url });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // sk_test_… while building
+const session = await stripe.checkout.sessions.create({
+  mode: 'subscription', // 'payment' for one-time
+  line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
+  client_reference_id: user.id,
+  subscription_data: { metadata: { userId: user.id } },
+  success_url: 'https://yourapp.com/upgraded?session_id={CHECKOUT_SESSION_ID}',
+  cancel_url: 'https://yourapp.com/pricing',
+  managed_payments: { enabled: true }, // MoR mode; omit for a plain gateway
 });
+// return session.url to the extension
+const event = stripe.webhooks.constructEvent(req.body, req.header('stripe-signature')!, process.env.STRIPE_WEBHOOK_SECRET!);
+// checkout.session.completed, customer.subscription.updated|deleted, invoice.payment_failed
 ```
 
-**Env vars**: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`
+- Managed Payments: activate in Dashboard, accept its terms, eligible tax code per product, API version `2025-03-31.basil`+, Checkout/Payment Links only.
+- Local webhooks: `stripe listen --forward-to localhost:3000/api/v1/webhooks/stripe` prints the `whsec_` secret.
+- Manage/cancel link: Customer Portal (`stripe.billingPortal.sessions.create`).
 
----
+## Paddle Billing
 
-## Lemon Squeezy (MoR)
+`npm i @paddle/paddle-node-sdk` · https://developer.paddle.com · llms.txt https://developer.paddle.com/llms.txt
 
-**Docs**: https://docs.lemonsqueezy.com
-
-**Setup:**
-1. Create store at lemonsqueezy.com
-2. Create product + variant (set price)
-3. Get checkout link or use API
-
-**Backend (verify license):**
-```typescript
-// Webhook: lemonsqueezy sends order/subscription events
-app.post('/webhook/lemonsqueezy', (req, res) => {
-  const event = req.body;
-  if (event.meta.event_name === 'order_created') {
-    activateLicense(event.data.attributes.user_email);
-  }
-  res.sendStatus(200);
+```ts
+import { Paddle, Environment, EventName } from '@paddle/paddle-node-sdk';
+const paddle = new Paddle(process.env.PADDLE_API_KEY!, { environment: Environment.sandbox });
+const txn = await paddle.transactions.create({
+  items: [{ priceId: process.env.PADDLE_PRICE_ID!, quantity: 1 }],
+  customData: { userId: user.id },
 });
+// txn.checkout?.url = approved default payment link + ?_ptxn=…
+const event = await paddle.webhooks.unmarshal(req.body.toString(), process.env.PADDLE_WEBHOOK_SECRET!, req.header('paddle-signature') ?? '');
+if (event.eventType === EventName.SubscriptionCanceled) { /* revoke */ }
 ```
 
-**Extension (open checkout):**
-```typescript
-// Direct checkout URL (simplest)
-chrome.tabs.create({ url: 'https://yourstore.lemonsqueezy.com/checkout/buy/xxx' });
+- Checkout is Paddle.js on a page on your approved domain (the default payment link, set under Checkout settings — without it `checkout.url` is absent). Paddle.js can't load in MV3 extension pages; open the URL in a tab.
+- No built-in license keys in Paddle Billing; derive entitlements from transaction/subscription webhooks.
+
+## Polar
+
+`npm i @polar-sh/sdk` · https://polar.sh/docs · llms.txt https://polar.sh/docs/llms.txt
+
+```ts
+import { Polar } from '@polar-sh/sdk';
+import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks';
+const polar = new Polar({ accessToken: process.env.POLAR_ACCESS_TOKEN!, server: 'sandbox' });
+const checkout = await polar.checkouts.create({ products: [process.env.POLAR_PRODUCT_ID!], externalCustomerId: user.id });
+// checkout.url
+const event = validateEvent(req.body, req.headers, process.env.POLAR_WEBHOOK_SECRET!); // WebhookVerificationError → 403
 ```
 
-**Env vars**: `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID`, `LEMONSQUEEZY_WEBHOOK_SECRET`
+License keys from the extension (public endpoint, no token):
 
----
-
-## Paddle (MoR)
-
-**Docs**: https://developer.paddle.com
-
-**Setup:**
-1. Create Paddle account → get vendor ID
-2. Create product + price in dashboard
-3. Use Paddle.js overlay checkout (no redirect needed)
-
-**Extension (popup checkout):**
-```html
-<!-- In options page or popup (must be extension page, not content script) -->
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
-<script>
-  Paddle.Initialize({ token: 'YOUR_CLIENT_TOKEN' });
-  function checkout() {
-    Paddle.Checkout.open({ items: [{ priceId: 'pri_xxx', quantity: 1 }] });
-  }
-</script>
-```
-
-**Env vars**: `PADDLE_API_KEY`, `PADDLE_CLIENT_TOKEN`, `PADDLE_WEBHOOK_SECRET`
-
----
-
-## Polar (MoR)
-
-**Docs**: https://docs.polar.sh | **llms.txt**: https://docs.polar.sh/llms-full.txt
-
-**Setup:**
-1. Create Polar account, link GitHub (optional)
-2. Create product + benefit (license key or custom)
-3. Use Polar checkout or API
-
-**Backend:**
-```typescript
-// Verify license via Polar API
-const res = await fetch('https://api.polar.sh/v1/licenses/validate', {
+```ts
+const res = await fetch('https://api.polar.sh/v1/customer-portal/license-keys/validate', {
   method: 'POST',
-  headers: { Authorization: `Bearer ${POLAR_ACCESS_TOKEN}` },
-  body: JSON.stringify({ key: licenseKey }),
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ key, organization_id: POLAR_ORG_ID, activation_id }), // activation_id only if activation limits are on
 });
-const { valid } = await res.json();
+const lk = await res.json(); // lk.status === 'granted'
 ```
 
-**Env vars**: `POLAR_ACCESS_TOKEN`, `POLAR_ORGANIZATION_ID`
+Server-side, use `/v1/license-keys/validate` with a token. Sandbox API: `https://sandbox-api.polar.sh/v1`.
 
----
+## Dodo Payments
 
-## Creem (MoR - Extension-Focused)
+`npm i dodopayments` · https://docs.dodopayments.com · llms.txt https://docs.dodopayments.com/llms.txt
 
-**Docs**: https://docs.creem.io
+```ts
+import DodoPayments from 'dodopayments';
+const dodo = new DodoPayments({
+  bearerToken: process.env.DODO_PAYMENTS_API_KEY!,
+  webhookKey: process.env.DODO_PAYMENTS_WEBHOOK_KEY!,
+  environment: 'test_mode', // default is live_mode
+});
+const session = await dodo.checkoutSessions.create({
+  product_cart: [{ product_id: process.env.DODO_PRODUCT_ID!, quantity: 1 }],
+  metadata: { userId: user.id },
+  return_url: 'https://yourapp.com/upgraded',
+});
+// session.checkout_url — single use, expires; create one per attempt
+const h = (k: string) => req.header(k) ?? '';
+const event = dodo.webhooks.unwrap(req.body.toString(), {
+  headers: { 'webhook-id': h('webhook-id'), 'webhook-signature': h('webhook-signature'), 'webhook-timestamp': h('webhook-timestamp') },
+});
+```
 
-Built specifically for browser extension monetization:
-1. Create Creem account
-2. Configure product and pricing
-3. Integrate SDK or use checkout links
-4. Webhook for license activation
+- Webhooks follow the Standard Webhooks spec (`standardwebhooks` package also verifies them).
+- License keys: `/licenses/activate`, `/licenses/validate`, `/licenses/deactivate` are public (no API key), so the extension can call them.
 
-**Env vars**: `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET`
+## Creem
 
----
+`npm i creem` · https://docs.creem.io · llms.txt https://docs.creem.io/llms.txt
 
-## Common Setup Checklist (All Providers)
+```ts
+import { Creem } from 'creem';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+const creem = new Creem({ apiKey: process.env.CREEM_API_KEY! }); // test-mode key while building
+const checkout = await creem.checkouts.create({ productId: process.env.CREEM_PRODUCT_ID!, successUrl: 'https://yourapp.com/upgraded', metadata: { userId: user.id } });
+// checkout.checkoutUrl
+const expected = createHmac('sha256', process.env.CREEM_WEBHOOK_SECRET!).update(req.body).digest('hex');
+const got = req.header('creem-signature') ?? '';
+const ok = got.length === expected.length && timingSafeEqual(Buffer.from(got), Buffer.from(expected));
+```
 
-1. [ ] Create account with provider
-2. [ ] Create product/price in dashboard
-3. [ ] Set up backend API (create-checkout, webhook, verify-license)
-4. [ ] Configure webhook URL in provider dashboard
-5. [ ] Add checkout button in extension UI (popup/options)
-6. [ ] Implement license verification in extension
-7. [ ] Cache license in chrome.storage.local
-8. [ ] Test: purchase → webhook → license active → feature unlocked
-9. [ ] Test: subscription cancel → webhook → license deactivated
-10. [ ] Never expose API keys in extension source code
+`creem.licenses.activate/validate/deactivate` require the API key, so proxy them through your server. Sandbox API: `https://test-api.creem.io`.
+
+## ExtensionPay (no backend)
+
+`npm i extpay` · https://github.com/Glench/ExtPay
+
+```ts
+// service worker, top level, once
+import ExtPay from 'extpay';
+ExtPay('your-extensionpay-id').startBackground();
+// popup / options (getUser can throw on network errors)
+const extpay = ExtPay('your-extensionpay-id');
+const user = await extpay.getUser();
+if (!user.paid) await extpay.openPaymentPage();
+```
+
+- Needs only `storage`. `extpay.onPaid` also needs a content script on `https://extensionpay.com/*`, which adds an install warning — prefer re-checking `getUser()` when the popup opens.
+- In service worker callbacks call `ExtPay(id)` again instead of reusing a top-level instance.
+- Trials: `openTrialPage()` + `user.trialStartedAt`. Subscriptions: `user.subscriptionStatus`; `openPaymentPage()` doubles as the manage/cancel page.
+- Checkout runs on the developer's Stripe account; test with Stripe test cards.
+
+## Lemon Squeezy (existing integrations)
+
+https://docs.lemonsqueezy.com — don't start new integrations here.
+
+- Webhooks: `X-Signature` = hex HMAC-SHA256 of the raw body with the signing secret; compare with `timingSafeEqual`.
+- License API (no API key): `POST https://api.lemonsqueezy.com/v1/licenses/validate` with form fields `license_key`, optional `instance_id`; `activate`/`deactivate` siblings exist.

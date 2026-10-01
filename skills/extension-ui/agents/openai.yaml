@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension UI"
+  short_description: "Design and polish popup, side panel, options, and injected extension UI"
+  default_prompt: "Polish my extension's popup and side panel: tighten the layout, add dark mode and loading/empty/error states, and verify it visually."

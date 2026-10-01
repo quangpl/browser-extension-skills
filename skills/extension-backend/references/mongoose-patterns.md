@@ -1,149 +1,150 @@
-# Mongoose Patterns for Extension Backend
+# Mongoose Patterns (@nestjs/mongoose 12, Mongoose 9)
 
-**Docs**: https://mongoosejs.com/docs/
+## Contents
+- Schemas: User, License, ProcessedEvent
+- License service (idempotent writes)
+- Webhook idempotency helper
+- Module registration
+- Mongoose 9 gotchas
 
-## User Schema
+Docs: https://docs.nestjs.com/techniques/mongodb, https://mongoosejs.com/docs/
+
+## Schemas
+
+Schema classes are plain classes; the document type is `HydratedDocument<T>` (extending `Document` is the legacy pattern).
 
 ```typescript
-// auth/schemas/user.schema.ts
+// users/user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import type { HydratedDocument } from 'mongoose';
 
 @Schema({ timestamps: true })
-export class User extends Document {
-  @Prop({ required: true, unique: true, index: true })
-  email: string;
-
-  @Prop({ required: true })
-  googleId: string;
-
-  @Prop({ default: 'free', enum: ['free', 'premium', 'enterprise'] })
-  plan: string;
-
-  @Prop()
-  stripeCustomerId?: string;
+export class User {
+  @Prop({ required: true, unique: true }) googleSub: string;   // stable id from the token
+  @Prop() email?: string;                                      // may change; not a key
+  @Prop() stripeCustomerId?: string;
 }
-
+export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);
 ```
 
-## License Schema
-
 ```typescript
-// license/schemas/license.schema.ts
+// license/license.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import type { HydratedDocument } from 'mongoose';
 
+export type LicenseStatus = 'active' | 'trialing' | 'past_due' | 'canceled'; // map other provider states onto these
+export type Entitlement = { plan: 'free' | 'pro'; status: LicenseStatus | 'none'; features: string[]; currentPeriodEnd: string | null };
 @Schema({ timestamps: true })
-export class License extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
-  userId: Types.ObjectId;
-
-  @Prop({ required: true, enum: ['active', 'expired', 'cancelled'] })
-  status: string;
-
-  @Prop({ required: true })
-  plan: string;
-
-  @Prop()
-  expiresAt?: Date;
-
-  @Prop()
-  providerSubscriptionId?: string;
-
-  @Prop({ default: 'stripe', enum: ['stripe', 'paddle', 'lemonsqueezy', 'polar'] })
-  provider: string;
+export class License {
+  @Prop({ required: true, unique: true }) userSub: string;      // one license row per user
+  @Prop({ required: true, type: String, enum: ['active', 'trialing', 'past_due', 'canceled'] })
+  status: LicenseStatus;
+  @Prop({ required: true, type: String, enum: ['pro'] }) plan: 'pro';
+  @Prop() currentPeriodEnd?: Date;
+  @Prop() provider?: string;                                    // 'stripe' | 'paddle' | ...
+  @Prop({ index: true }) providerSubscriptionId?: string;
 }
-
+export type LicenseDocument = HydratedDocument<License>;
 export const LicenseSchema = SchemaFactory.createForClass(License);
-// Index for fast lookups
-LicenseSchema.index({ userId: 1, status: 1 });
 ```
 
-## Service Pattern
+```typescript
+// webhook/processed-event.schema.ts
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+@Schema({ timestamps: true })
+export class ProcessedEvent {
+  @Prop({ required: true, unique: true }) eventId: string;
+  @Prop() type?: string;
+}
+export const ProcessedEventSchema = SchemaFactory.createForClass(ProcessedEvent);
+ProcessedEventSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 30 }); // keep 30 days
+```
+
+Union-typed props need an explicit `type: String`; reflection only sees `Object`.
+
+## License service
 
 ```typescript
 // license/license.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { License } from './schemas/license.schema';
+import type { Model } from 'mongoose';
+import { License, type Entitlement, type LicenseStatus } from './license.schema.js';
+const ENTITLED: LicenseStatus[] = ['active', 'trialing'];
+const PRO_FEATURES = ['sync', 'ai']; // feature keys the extension gates on
 
 @Injectable()
 export class LicenseService {
-  constructor(@InjectModel(License.name) private licenseModel: Model<License>) {}
+  constructor(@InjectModel(License.name) private readonly licenses: Model<License>) {}
 
-  async findActiveByUserId(userId: string): Promise<License | null> {
-    return this.licenseModel.findOne({
-      userId,
-      status: 'active',
-      $or: [{ expiresAt: { $gt: new Date() } }, { expiresAt: null }],
-    }).exec();
+  async entitlement(userSub: string): Promise<Entitlement> { // GET /api/v1/entitlement body
+    const l = await this.licenses.findOne({ userSub }).lean().exec();
+    const paid = !!l && ENTITLED.includes(l.status) && (!l.currentPeriodEnd || l.currentPeriodEnd > new Date());
+    const currentPeriodEnd = l?.currentPeriodEnd?.toISOString() ?? null;
+    return { plan: paid ? l!.plan : 'free', status: l?.status ?? 'none', features: paid ? PRO_FEATURES : [], currentPeriodEnd };
   }
 
-  async activate(userId: string, plan: string, subscriptionId: string, provider: string) {
-    return this.licenseModel.findOneAndUpdate(
-      { userId },
-      { status: 'active', plan, providerSubscriptionId: subscriptionId, provider },
-      { upsert: true, new: true },
-    ).exec();
-  }
-
-  async deactivate(subscriptionId: string) {
-    return this.licenseModel.findOneAndUpdate(
-      { providerSubscriptionId: subscriptionId },
-      { status: 'cancelled' },
-    ).exec();
+  upsertFromProvider(userSub: string, data: Omit<License, 'userSub'>) { // unique key => replays are harmless
+    return this.licenses
+      .findOneAndUpdate({ userSub }, { $set: data }, { upsert: true, returnDocument: 'after' })
+      .exec();
   }
 }
 ```
 
-## Module Registration
+## Webhook idempotency helper
+
+```typescript
+// webhook/webhook.service.ts (excerpt)
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import type { Model } from 'mongoose';
+import { ProcessedEvent } from './processed-event.schema.js';
+
+@Injectable()
+export class WebhookService {
+  constructor(@InjectModel(ProcessedEvent.name) private readonly events: Model<ProcessedEvent>) {}
+
+  async handleOnce(eventId: string, type: string, apply: () => Promise<void>) {
+    try {
+      await this.events.create({ eventId, type });
+    } catch (e) {
+      if ((e as { code?: number }).code === 11000) return; // already processed
+      throw e;
+    }
+    try {
+      await apply();
+    } catch (e) {
+      await this.events.deleteOne({ eventId }); // let the provider's retry run it again
+      throw e;
+    }
+  }
+}
+```
+
+## Module registration
 
 ```typescript
 // license/license.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { License, LicenseSchema } from './schemas/license.schema';
-import { LicenseService } from './license.service';
-import { LicenseController } from './license.controller';
-
+import { AuthModule } from '../auth/auth.module.js';
+import { License, LicenseSchema } from './license.schema.js';
+import { LicenseService } from './license.service.js';
+import { EntitlementController } from './entitlement.controller.js';
 @Module({
-  imports: [MongooseModule.forFeature([{ name: License.name, schema: LicenseSchema }])],
+  imports: [AuthModule, MongooseModule.forFeature([{ name: License.name, schema: LicenseSchema }])], // AuthModule exports AuthService for AuthGuard
   providers: [LicenseService],
-  controllers: [LicenseController],
-  exports: [LicenseService],
+  controllers: [EntitlementController],
+  exports: [LicenseService], // WebhookModule writes licenses
 })
 export class LicenseModule {}
 ```
 
-## Query Patterns
+## Mongoose 9 gotchas
 
-```typescript
-// Find with pagination
-async findAll(page = 1, limit = 20) {
-  return this.licenseModel
-    .find()
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .sort({ createdAt: -1 })
-    .exec();
-}
-
-// Aggregation (monthly stats)
-async monthlyStats() {
-  return this.licenseModel.aggregate([
-    { $match: { status: 'active' } },
-    { $group: { _id: '$plan', count: { $sum: 1 } } },
-  ]);
-}
-```
-
-## Best Practices
-
-- Always add `index: true` on fields used in queries (email, userId)
-- Use `timestamps: true` on all schemas (auto createdAt/updatedAt)
-- Use `lean()` for read-only queries (returns plain objects, faster)
-- Use `select()` to return only needed fields
-- Use `enum` validators on string fields with fixed values
-- Use `findOneAndUpdate` with `upsert` for idempotent operations
+- `findOneAndUpdate(..., { new: true })` prints a deprecation warning; use `returnDocument: 'after'`.
+- Pre middleware no longer receives `next()`; write `schema.pre('save', async function () { ... })`.
+- Node 20.19+ is required; the index `background` option is removed. `autoIndex` builds indexes on boot; for large production collections create them in a migration and set `autoIndex: false`.

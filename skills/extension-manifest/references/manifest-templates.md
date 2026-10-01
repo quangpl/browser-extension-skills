@@ -1,133 +1,124 @@
-# Manifest Templates (MV3)
+# Manifest Templates and Framework Config
 
-## 1. Simple Popup Extension
+## Contents
+- Where the manifest lives
+- WXT
+- Plasmo
+- Vanilla / CRXJS templates
 
-Toolbar button opens a popup. No content script, no background logic.
+## Where the manifest lives
+
+| Project | Edit | Generated output to audit |
+|---|---|---|
+| WXT (`wxt.config.*`) | `manifest` in `wxt.config.ts` + entrypoint options (`defineContentScript({ matches })`, `<meta name="manifest.*">` in HTML entrypoints) | `.output/chrome-mv3/manifest.json` after `wxt build` |
+| Plasmo (`plasmo` dependency) | `"manifest"` field in `package.json` + content script `export const config: PlasmoCSConfig` | `build/chrome-mv3-prod/manifest.json` after `plasmo build` |
+| CRXJS / Vite | `manifest.json` or `manifest.config.ts` (`defineManifest`) | `dist/manifest.json` |
+| Vanilla | `manifest.json` | same file |
+
+Never hand-edit generated output; it is overwritten on the next build. Audit production builds: dev builds add reload permissions.
+
+## WXT
+
+Docs: https://wxt.dev/guide/essentials/config/manifest. WXT derives `name`/`version` from `package.json`, discovers icons in `public/` (`icon-16.png`, `icon/16.png`, …), and generates `action`, `background`, `content_scripts`, `side_panel`, `options_ui` from entrypoints. Write MV3 shapes; WXT converts for MV2/Firefox targets.
+
+```ts
+// wxt.config.ts
+import { defineConfig } from 'wxt';
+
+export default defineConfig({
+  manifest: ({ browser }) => ({
+    permissions: ['storage', 'activeTab', 'scripting'],
+    optional_host_permissions: ['https://*/*'],
+    ...(browser === 'chrome' && { minimum_chrome_version: '116' }),
+  }),
+});
+```
+
+- Content script hosts belong in the entrypoint: `export default defineContentScript({ matches: ['https://*.example.com/*'], main() {} })`.
+- Dev mode adds `tabs` and `scripting` for hot reload; a `sidepanel` entrypoint adds `sidePanel`. Do not copy those into config unless the code needs them.
+- Per-browser differences go in the function form (`browser`, `manifestVersion`, `mode`, `command`).
+- `action: {}` without a popup entrypoint gives a click-only action for `activeTab` + `action.onClicked`.
+- Hooks (`hooks: { 'build:manifestGenerated': (wxt, manifest) => {} }`) are the escape hatch for edits the config cannot express.
+
+## Plasmo
+
+Docs: https://docs.plasmo.com/framework/customization/manifest. Plasmo maps `package.json` `version`, `displayName` → `name`, `description`, `author`, `homepage` → `homepage_url`, and merges the `"manifest"` field on top of what it generates.
+
+```json
+{
+  "displayName": "Example",
+  "version": "1.2.0",
+  "manifest": {
+    "permissions": ["storage", "activeTab"],
+    "host_permissions": ["https://api.example.com/*"]
+  }
+}
+```
+
+- Scaffolds often start with `"host_permissions": ["https://*/*"]`; narrow or remove it if no feature needs all sites.
+- `$ENV_VAR` values are substituted at build time; fields whose variable is missing are dropped (useful for per-browser IDs).
+- Content script hosts: `export const config: PlasmoCSConfig = { matches: ['https://*.example.com/*'] }`.
+
+## Vanilla / CRXJS templates
+
+Click-to-run on the current page (no install warnings):
 
 ```json
 {
   "manifest_version": 3,
-  "name": "Simple Popup",
+  "name": "Page Tool",
   "version": "1.0.0",
-  "description": "Click the toolbar button to open a popup.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Open Popup"
-  },
+  "description": "Runs on the current page when you click the toolbar button.",
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "action": { "default_title": "Run on this page" },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "permissions": ["activeTab", "scripting"]
+}
+```
+
+Site-specific content script (warning: "Read and change your data on all example.com sites"):
+
+```json
+{
+  "content_scripts": [{ "matches": ["https://*.example.com/*"], "js": ["content.js"], "run_at": "document_idle" }],
+  "web_accessible_resources": [{ "resources": ["assets/*"], "matches": ["https://*.example.com/*"], "use_dynamic_url": true }],
   "permissions": ["storage"]
 }
 ```
 
----
-
-## 2. Content Script Extension
-
-Injects JS/CSS into matching pages. Communicates with background via messages.
+Side panel opened from the toolbar:
 
 ```json
 {
-  "manifest_version": 3,
-  "name": "Content Script Extension",
-  "version": "1.0.0",
-  "description": "Modifies pages on example.com.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
-  "permissions": ["storage", "activeTab"],
-  "host_permissions": ["https://*.example.com/*"],
-  "content_scripts": [{
-    "matches": ["https://*.example.com/*"],
-    "js": ["content.js"],
-    "css": ["content.css"],
-    "run_at": "document_idle"
-  }],
-  "background": { "service_worker": "background.js", "type": "module" },
-  "web_accessible_resources": [{
-    "resources": ["images/*"],
-    "matches": ["https://*.example.com/*"]
-  }]
-}
-```
-
----
-
-## 3. Side Panel Extension
-
-Opens a persistent side panel alongside the browser.
-
-```json
-{
-  "manifest_version": 3,
-  "name": "Side Panel Extension",
-  "version": "1.0.0",
-  "description": "Provides a persistent side panel for enhanced browsing.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
-  "permissions": ["sidePanel", "storage", "activeTab"],
-  "action": { "default_title": "Open Side Panel" },
+  "action": { "default_title": "Open side panel" },
   "side_panel": { "default_path": "sidepanel.html" },
-  "background": { "service_worker": "background.js", "type": "module" }
+  "background": { "service_worker": "background.js", "type": "module" },
+  "permissions": ["sidePanel", "storage"],
+  "minimum_chrome_version": "114"
 }
 ```
 
-Background registers the side panel:
-```js
-// background.js
+```ts
+// background.ts
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 ```
 
----
-
-## 4. DevTools Extension
-
-Adds a custom panel to Chrome DevTools.
+User-chosen sites (no host warning at install; request per site from a click handler):
 
 ```json
 {
-  "manifest_version": 3,
-  "name": "DevTools Extension",
-  "version": "1.0.0",
-  "description": "Adds a custom panel to Chrome DevTools.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
-  "devtools_page": "devtools.html",
-  "permissions": ["storage"]
-}
-```
-
-```html
-<!-- devtools.html -->
-<script src="devtools.js"></script>
-```
-```js
-// devtools.js
-chrome.devtools.panels.create("My Panel", "icons/icon16.png", "panel.html");
-```
-
----
-
-## 5. Extension with Optional Permissions
-
-Requests sensitive permissions only when user explicitly needs them.
-
-```json
-{
-  "manifest_version": 3,
-  "name": "Optional Permissions Extension",
-  "version": "1.0.0",
-  "description": "Requests extra permissions only when needed.",
-  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
-  "action": { "default_popup": "popup.html" },
-  "permissions": ["storage"],
-  "optional_permissions": ["tabs", "bookmarks"],
+  "permissions": ["storage", "scripting"],
   "optional_host_permissions": ["https://*/*"]
 }
 ```
 
-```js
-// Request at runtime (must be triggered by user gesture)
-async function requestOptionalPermissions() {
-  const granted = await chrome.permissions.request({
-    permissions: ["tabs"],
-    origins: ["https://*/*"]
-  });
-  return granted;
+Request blocker with static rules:
+
+```json
+{
+  "permissions": ["declarativeNetRequest"],
+  "declarative_net_request": {
+    "rule_resources": [{ "id": "default", "enabled": true, "path": "rules/default.json" }]
+  }
 }
 ```

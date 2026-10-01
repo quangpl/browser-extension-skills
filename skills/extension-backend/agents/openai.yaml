@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Backend"
+  short_description: "Build the API behind your extension: auth, licenses, webhooks, key proxy"
+  default_prompt: "Add a backend for my Chrome extension that verifies Google sign-in, checks the user's license, and keeps my API key off the client."

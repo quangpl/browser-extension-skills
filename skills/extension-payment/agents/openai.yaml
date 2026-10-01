@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Payment"
+  short_description: "Add paid plans, checkout, and license checks to a browser extension"
+  default_prompt: "Add a Pro subscription to my Chrome extension with checkout and server-verified license checks."

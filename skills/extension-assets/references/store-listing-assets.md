@@ -1,104 +1,114 @@
-# Chrome Web Store Listing Assets
+# Chrome Web Store Listing Images
 
-## Required Assets
+## Contents
+- Required and optional images
+- Screenshots: capture and compose
+- Promo tiles
+- Localized images
+- Checklist
 
-### Store Icon
-- Size: 128x128 PNG
-- Same file as `icon128.png` in manifest
-- Displayed in search results and listing page
+Listing copy, category, and privacy fields belong to the publishing workflow, not here.
 
-### Screenshots (required: 1–5)
-| Dimension | Notes |
-|-----------|-------|
-| 1280x800 | Recommended (full HD 16:10) |
-| 640x400 | Alternative (half size) |
+## Required and optional images
 
-- Format: PNG or JPG
-- No rounded corners — CWS adds them automatically
-- No device frames — show real UI, CWS may add frame
-- Must show extension in action, not just marketing copy
+| Image | Size | Format | Required |
+|---|---|---|---|
+| Store icon | 128×128 (96×96 artwork + 16px transparent padding) | PNG | Yes — the manifest 128 icon |
+| Screenshot | 1280×800 (preferred) or 640×400 | PNG or JPEG | At least 1, up to 5 |
+| Small promo tile | 440×280 | PNG or JPEG | Yes |
+| Marquee promo tile | 1400×560 | PNG or JPEG | No — needed to be eligible for marquee featuring |
 
-## Promotional Images
+CWS lists no other promo sizes; templates for a 920×680 "large tile" are obsolete.
 
-| Asset | Size | Purpose |
-|-------|------|---------|
-| Small promo tile | 440x280 | Required for featured/collection placement |
-| Large promo tile | 920x680 | Used in marquee/spotlight |
-| Marquee promo tile | 1400x560 | Homepage banner (invite-only) |
+Sources: https://developer.chrome.com/docs/webstore/images, https://developer.chrome.com/docs/webstore/cws-dashboard-listing#graphic-assets
 
-All promo images:
-- Format: PNG or JPG
-- No alpha/transparency
-- Include extension name and tagline
-- Consistent branding with extension icon
+## Screenshots: capture and compose
 
-## Text Requirements
+CWS asks that screenshots demonstrate the actual user experience: square corners, no padding (full bleed), exact pixel size. Use real captures; if the UI isn't built yet, deliver the capture plan instead of placeholder art that would misrepresent the extension.
 
-### Short Description
-- Max: 132 characters
-- Shown in search results
-- Front-load the value proposition
+Default: capture with Playwright using the built extension, then compose with sharp.
 
-### Full Description
-- Max: 16,000 characters
-- First 150 characters appear in search results — make them count
-- Use line breaks and sections for readability
-- Include keywords naturally
+```ts
+// capture-screens.ts — run after `npm run build`; EXT = built folder containing manifest.json
+import { chromium } from 'playwright';
+import path from 'node:path';
 
-## Screenshot Best Practices
+const EXT = path.resolve('.output/chrome-mv3');
+const ctx = await chromium.launchPersistentContext('', {
+  channel: 'chromium', // allows extensions in headless mode
+  viewport: { width: 1280, height: 800 },
+  deviceScaleFactor: 1,
+  args: [`--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`],
+});
+let [sw] = ctx.serviceWorkers();
+sw ??= await ctx.waitForEvent('serviceworker');
+const id = new URL(sw.url()).host;
 
-1. **Show features in action** — real use case, not empty state
-2. **Consistent UI** — same browser theme across all screenshots
-3. **Clean data** — no personal info, test data only
-4. **Highlight key features** — each screenshot = one feature
-5. **Add captions** — text overlays explaining what's shown
-6. **Order matters** — first screenshot is most prominent
+const page = await ctx.newPage();
+await page.goto('https://example.com'); // a realistic page where the extension acts
+await page.screenshot({ path: 'store/raw-page.png' });
 
-## Category Selection Guide
-
-| Category | Best for |
-|----------|----------|
-| Productivity | Tab management, notes, focus tools |
-| Developer Tools | DevTools, API testers, code helpers |
-| Shopping | Price compare, coupon finders |
-| News & Weather | Feed readers, aggregators |
-| Social & Communication | Chat enhancers, email tools |
-| Accessibility | Screen readers, font tools |
-
-## Generation: Placeholder Assets
-
-```bash
-# Screenshot placeholder
-convert -size 1280x800 xc:"#f8f9fa" \
-  -font DejaVu-Sans -pointsize 40 -fill "#495057" \
-  -gravity center -annotate 0 "Screenshot 1\nShow your feature here\n1280x800" \
-  screenshot1.png
-
-# Small promo tile
-convert -size 440x280 gradient:"#4285f4-#0d47a1" \
-  -font DejaVu-Sans-Bold -pointsize 36 -fill white \
-  -gravity center -annotate 0 "Extension Name\nYour tagline here" \
-  promo-small.png
-
-# Large promo tile
-convert -size 920x680 gradient:"#4285f4-#0d47a1" \
-  -font DejaVu-Sans-Bold -pointsize 48 -fill white \
-  -gravity center -annotate 0 "Extension Name\nYour tagline here" \
-  promo-large.png
+const popup = await ctx.newPage();
+await popup.setViewportSize({ width: 380, height: 560 }); // match the popup's real size
+await popup.goto(`chrome-extension://${id}/popup.html`);
+await popup.screenshot({ path: 'store/raw-popup.png' });
+await ctx.close();
 ```
 
-## Localization
+Compose a 1280×800 frame: page capture as background, popup placed near the top-right where the toolbar popup would open, optional caption band.
 
-- Upload separate screenshots per locale in CWS Developer Dashboard
-- Localize promo tile text (create variants per language)
-- `_locales/` folder handles UI strings — store assets localized manually via dashboard
-- Priority locales: en, es, pt, de, fr, ja, ko, zh-CN
+```ts
+import sharp from 'sharp';
+await sharp('store/raw-page.png')
+  .resize(1280, 800, { fit: 'cover' })
+  .composite([{ input: 'store/raw-popup.png', top: 16, left: 1280 - 380 - 24 }])
+  .flatten({ background: '#ffffff' })
+  .png()
+  .toFile('store/screenshot-1.png');
+```
 
-## Validation Checklist
+Rules of thumb:
+- One feature per screenshot; the first one carries the main value proposition.
+- Use seeded demo data — no real names, emails, tokens, or private URLs.
+- Short caption text is fine on screenshots (unlike promo tiles); keep it ≥ 24px so it survives the store's downscaling.
+- Same browser theme and accent color across the set.
 
-- [ ] 128x128 store icon uploaded
-- [ ] At least 1 screenshot (1280x800 or 640x400)
-- [ ] Short description ≤ 132 chars
-- [ ] First 150 chars of full description are compelling
-- [ ] Small promo tile (440x280) if seeking featured placement
-- [ ] No personal data visible in screenshots
+## Promo tiles
+
+CWS guidance for promotional images:
+- Communicate the brand, not a screenshot. Avoid text (the extension name at most).
+- Fill the whole region with saturated color; avoid large white/light-gray areas — the tile sits on a light gray page.
+- Well-defined edges; still readable at half size.
+- Export opaque (no transparency).
+- Google brand references must follow https://developer.chrome.com/docs/webstore/branding.
+
+Fast default: compose from the icon source with sharp — brand-color background plus the mark, centered or offset.
+
+```ts
+import sharp from 'sharp';
+const tile = async (w: number, h: number, out: string) => {
+  const bg = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+       <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs>
+       <rect width="100%" height="100%" fill="url(#g)"/></svg>`);
+  const mark = await sharp('assets/icon.svg', { density: 600 }).resize(Math.round(h * 0.55)).png().toBuffer();
+  await sharp(bg).composite([{ input: mark, gravity: 'center' }]).flatten().png().toFile(out);
+};
+await tile(440, 280, 'store/promo-small-440x280.png');
+await tile(1400, 560, 'store/promo-marquee-1400x560.png');
+```
+
+For richer art, use the prompts in the image-generation reference, then crop/resize to the exact size with `sharp(...).resize(w, h, { fit: 'cover' })`.
+
+## Localized images
+
+Screenshots and promo tiles can be uploaded per locale in the CWS dashboard (Store listing → language selector). Produce `store/<locale>/screenshot-N.png` only for locales the extension UI actually supports (`_locales/`).
+
+## Checklist
+
+- [ ] `store/` is outside the packaged folder (WXT `public/` and Plasmo `assets/` are bundled — keep store art in a top-level `store/`).
+- [ ] Store icon: 128 PNG with 96px artwork, readable on light and dark.
+- [ ] 1–5 screenshots, exactly 1280×800 (or 640×400), real UI, no personal data.
+- [ ] Small promo tile 440×280, opaque, little or no text.
+- [ ] Marquee 1400×560 if the developer wants featuring eligibility.
+- [ ] Verify sizes: `node -e "import('sharp').then(async ({default:s})=>{for (const f of process.argv.slice(1)) {const m=await s(f).metadata(); console.log(f, m.width+'x'+m.height, m.hasAlpha?'alpha':'opaque')}})" store/*.png`

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extension Analyze"
+  short_description: "Audit an extension for security, performance, and MV3 issues"
+  default_prompt: "Audit my browser extension for security vulnerabilities and performance problems, with file:line evidence and fixes."
