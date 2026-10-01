@@ -1,0 +1,25 @@
+{
+  "name": "browser-extension-skills",
+  "description": "Agent Skills for building, testing, reviewing, and publishing Chrome/browser extensions (MV3, WXT, Chrome Web Store).",
+  "owner": {
+    "name": "quangpl",
+    "url": "https://github.com/quangpl"
+  },
+  "plugins": [
+    {
+      "name": "extension-skills",
+      "source": "./",
+      "description": "12 skills for Chrome extension work: scaffold, develop, UI, manifest and permissions, security audit, CWS rejection review, tests, assets, publishing, MV2 to MV3 migration, payments, and backend.",
+      "version": "2.0.0",
+      "author": {
+        "name": "quangpl",
+        "url": "https://github.com/quangpl"
+      },
+      "homepage": "https://github.com/quangpl/browser-extension-skills",
+      "repository": "https://github.com/quangpl/browser-extension-skills",
+      "license": "MIT",
+      "keywords": ["chrome-extension", "browser-extension", "manifest-v3", "wxt", "plasmo", "chrome-web-store"],
+      "category": "development"
+    }
+  ]
+}
